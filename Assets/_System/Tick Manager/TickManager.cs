@@ -1,10 +1,19 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using NUnit.Framework.Constraints;
 
 public class TickManager : MonoBehaviour
 {
+    #region Sub-classes
+
+    public enum ETickPriority
+    {
+        High,
+        Medium,
+        Low,
+        Disable
+    }
+
     [Serializable]
     public struct TickSettings
     {
@@ -36,10 +45,18 @@ public class TickManager : MonoBehaviour
         }
     }
 
-    [Header("Player ref")]
+    #endregion
+
+
+    #region Fields
+
+    [Header("Refs")]
 
     [SerializeField]
     private Transform _player = null;
+
+    [SerializeField]
+    private Camera _camera = null;
 
     [Header("Priority Distance Settings")]
 
@@ -48,6 +65,11 @@ public class TickManager : MonoBehaviour
 
     [SerializeField]
     private float _mediumPriorityDistance = 30f;
+
+    [Space]
+
+    [SerializeField]
+    private float _cullingDistance = 60f;
 
     [SerializeField]
     [Tooltip("Sort tickables groups each X seconds")]
@@ -64,7 +86,7 @@ public class TickManager : MonoBehaviour
     [SerializeField]
     private TickSettings _lowPrioritySettings = new(5, 3f, 25);
 
-    [Header("Debug Info")]
+    [Header("Debug")]
 
     [SerializeField]
     private bool _drawDebug = false;
@@ -72,28 +94,45 @@ public class TickManager : MonoBehaviour
     [SerializeField]
     private bool _showPerformanceStats = false;
 
-    // Update groups
-    private List<ITickable> _highPriorityList = new List<ITickable>();
-    private List<ITickable> _mediumPriorityList = new List<ITickable>();
-    private List<ITickable> _lowPriorityList = new List<ITickable>();
-    private List<ITickable> _allTickables = new List<ITickable>();
+    /// <summary>
+    /// All registered tickables
+    /// </summary>
+    private HashSet<ITickable> _allTickables = new HashSet<ITickable>();
 
-    // Settings mapping for groups
+    /// <summary>
+    /// Collection mapping priority levels to their respective tickables group.
+    /// </summary>
+    private Dictionary<ETickPriority, List<ITickable>> _priorityGroups;
+
+    /// <summary>
+    /// Collection cache that maps <see cref="ITickable"></see> instances to their current <see cref="ETickPriority"/>.
+    /// </summary>
+    private Dictionary<ITickable, ETickPriority> _tickablesPriorityCache = new Dictionary<ITickable, ETickPriority>();
+
+    /// <summary>
+    /// Mapping of priority levels to their corresponding tick settings.
+    /// </summary>
     private Dictionary<ETickPriority, TickSettings> _settingsMap;
-    private Dictionary<ETickPriority, List<ITickable>> _priorityLists;
+
 
     // Frame counters 
-    private int _highFrameCounter = 0;
-    private int _mediumFrameCounter = 0;
-    private int _lowFrameCounter = 0;
+    private int _highPriorityFrameCounter = 0;
+    private int _mediumPriorityFrameCounter = 0;
+    private int _lowPriorityFrameCounter = 0;
 
     // Groups sorting
     private float _lastSortTime = 0f;
     private float _highDistanceSqr;
     private float _mediumDistanceSqr;
 
+    // Culling
+    private float _cullingDistanceSqr;
+
     // Performance tracking
     private PerformanceStats _performanceStats = new PerformanceStats();
+
+    #endregion
+
 
     #region Lifecycle
 
@@ -140,18 +179,85 @@ public class TickManager : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     private void OnGUI()
     {
         if (_showPerformanceStats)
             DrawPerformanceStats();
     }
+#endif
 
     #endregion
 
-    #region Initialization
+
+    #region Public API
+
+    public int GetTotalTickablesCount() => _allTickables.Count;
+
+    public PerformanceStats GetPerformanceStats() => _performanceStats;
+
+    public void Register(ITickable tickable)
+    {
+        if (tickable == null)
+            return;
+
+        if (_allTickables.Add(tickable))
+        {
+            var prio = CalculatePriority(tickable);
+
+            if (prio != ETickPriority.Disable)
+            {
+                _priorityGroups[prio].Add(tickable);
+                _tickablesPriorityCache[tickable] = prio;
+            }
+
+            if (_drawDebug)
+            {
+                Debug.Log($"Registered updatable: {tickable}. Total count: {_allTickables.Count}");
+            }
+        }
+    }
+
+    public void Unregister(ITickable tickable)
+    {
+        if (tickable == null)
+            return;
+
+        if (_allTickables.Remove(tickable))
+        {
+            if (_tickablesPriorityCache.TryGetValue(tickable, out var prio))
+            {
+                _priorityGroups[prio].Remove(tickable);
+                _tickablesPriorityCache.Remove(tickable);
+            }
+        }
+
+        if (_drawDebug)
+        {
+            Debug.Log($"Unregistered tickable: {tickable}. Total count: {_allTickables.Count}");
+        }
+    }
+
+    public void GetGroupCounts(out int high, out int medium, out int low)
+    {
+        high = _priorityGroups[ETickPriority.High].Count;
+        medium = _priorityGroups[ETickPriority.Medium].Count;
+        low = _priorityGroups[ETickPriority.Low].Count;
+    }
+
+    #endregion
+
+
+    #region Private API
 
     private void InitManager()
     {
+        if (_camera == null)
+            _camera = Camera.main;
+
+        // Init culling distance
+        _cullingDistanceSqr = _cullingDistance * _cullingDistance;
+
         // Init squared distances
         _highDistanceSqr = _highPriorityDistance * _highPriorityDistance;
         _mediumDistanceSqr = _mediumPriorityDistance * _mediumPriorityDistance;
@@ -165,18 +271,12 @@ public class TickManager : MonoBehaviour
         };
 
         // Init priority lists mapping
-        _priorityLists = new Dictionary<ETickPriority, List<ITickable>>
+        _priorityGroups = new Dictionary<ETickPriority, List<ITickable>>
         {
-            { ETickPriority.High, _highPriorityList },
-            { ETickPriority.Medium, _mediumPriorityList },
-            { ETickPriority.Low, _lowPriorityList }
+            { ETickPriority.High, new List<ITickable>() },
+            { ETickPriority.Medium, new List<ITickable>()},
+            { ETickPriority.Low, new List<ITickable>() }
         };
-
-        // Clear all lists
-        _allTickables.Clear();
-        _highPriorityList.Clear();
-        _mediumPriorityList.Clear();
-        _lowPriorityList.Clear();
     }
 
     private void ValidateSettings()
@@ -200,98 +300,146 @@ public class TickManager : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Public API
-
-    public void Register(ITickable tickable)
+    private void SortUpdateGroupsByDistance()
     {
-        if (tickable == null)
+        if (_player == null)
             return;
 
-        if (!_allTickables.Contains(tickable))
+        float startTime = Time.realtimeSinceStartup * 1000f;
+
+        Vector3 playerPosition = _player.position;
+
+        // Sort all updatables
+        foreach (var tickable in _allTickables)
         {
-            _allTickables.Add(tickable);
+            if (tickable == null || !tickable.IsActive)
+                continue;
 
-            if (_drawDebug)
-            {
-                Debug.Log($"Registered updatable: {tickable}. Total count: {_allTickables.Count}");
-            }
+            ReorderTickablePriority(tickable);
         }
-    }
-
-    public void Unregister(ITickable tickable)
-    {
-        if (tickable == null)
-            return;
-
-        // Remove from all lists
-        _allTickables.Remove(tickable);
-        _highPriorityList.Remove(tickable);
-        _mediumPriorityList.Remove(tickable);
-        _lowPriorityList.Remove(tickable);
 
         if (_drawDebug)
         {
-            Debug.Log($"Unregistered tickable: {tickable}. Total count: {_allTickables.Count}");
+            float sortTime = (Time.realtimeSinceStartup * 1000f) - startTime;
+            _performanceStats.RecordSortTime(sortTime);
+
+            // Log group counts
+            var highPriorityList = _priorityGroups[ETickPriority.High];
+            var mediumPriorityList = _priorityGroups[ETickPriority.Medium];
+            var lowPriorityList = _priorityGroups[ETickPriority.Low];
+
+            Debug.Log($"Groups sorted in {sortTime:F1}ms - High: {highPriorityList.Count}, " +
+                     $"Medium: {mediumPriorityList.Count}, Low: {lowPriorityList.Count}");
         }
     }
 
-    public void GetGroupCounts(out int high, out int medium, out int low)
+    /// <summary>
+    /// Calculate the priority level for a given <see cref="ITickable"/> based on its distance to the player.
+    /// </summary>
+    /// <param name="tickable"></param>
+    /// <returns>Returns the corresponded <see cref="ETickPriority"/></returns>
+    private ETickPriority CalculatePriority(ITickable tickable)
     {
-        high = _highPriorityList.Count;
-        medium = _mediumPriorityList.Count;
-        low = _lowPriorityList.Count;
+        if (_player == null || tickable == null)
+            return ETickPriority.Disable;
+
+        float sqrDistance = (tickable.Position - _player.position).sqrMagnitude;
+
+        if (sqrDistance > _cullingDistanceSqr)
+            return ETickPriority.Disable;
+
+        else if (sqrDistance < _highDistanceSqr)
+            return ETickPriority.High;
+
+        else if (sqrDistance < _mediumDistanceSqr)
+            return ETickPriority.Medium;
+
+        else
+            return ETickPriority.Low;
     }
 
-    public int GetTotalTickablesCount() => _allTickables.Count;
+    /// <summary>
+    /// Reorder the priority of a tickable and move it between groups if necessary.
+    /// </summary>
+    /// <param name="tickable"></param>
+    private void ReorderTickablePriority(ITickable tickable)
+    {
+        var newPriority = CalculatePriority(tickable);
 
-    public PerformanceStats GetPerformanceStats() => _performanceStats;
+        if (_tickablesPriorityCache.TryGetValue(tickable, out var currentPriority)) // Existing tickable
+        {
+            if (currentPriority == newPriority)
+                return;
 
+            // Swap tickables between groups
+            if (currentPriority != ETickPriority.Disable)
+                _priorityGroups[currentPriority].Remove(tickable);
 
-    #endregion
+            if (newPriority != ETickPriority.Disable)
+                _priorityGroups[newPriority].Add(tickable);
 
-    #region Private API
+            // Update priority mapping
+            _tickablesPriorityCache[tickable] = newPriority;
+        }
+        else // New tickable to add to the appropriate group
+        {
+            if (newPriority != ETickPriority.Disable)
+            {
+                _priorityGroups[newPriority].Add(tickable);
+                _tickablesPriorityCache[tickable] = newPriority;
+            }
+        }
 
+    }
+
+    /// <summary>
+    /// Tick the high priority group based on its frame interval setting.
+    /// </summary>
     private void TickHighPriorityGroup()
     {
-        _highFrameCounter++;
-        if (_highFrameCounter >= _highPrioritySettings.FrameInterval)
+        _highPriorityFrameCounter++;
+        if (_highPriorityFrameCounter >= _highPrioritySettings.FrameInterval)
         {
-            _highFrameCounter = 0;
+            _highPriorityFrameCounter = 0;
             TickGroup(ETickPriority.High);
         }
     }
 
+    /// <summary>
+    /// Tick the medium priority group based on its frame interval setting.
+    /// </summary>
     private void TickMediumPriorityGroup()
     {
-        _mediumFrameCounter++;
-        if (_mediumFrameCounter >= _mediumPrioritySettings.FrameInterval)
+        _mediumPriorityFrameCounter++;
+        if (_mediumPriorityFrameCounter >= _mediumPrioritySettings.FrameInterval)
         {
-            _mediumFrameCounter = 0;
+            _mediumPriorityFrameCounter = 0;
             TickGroup(ETickPriority.Medium);
         }
     }
 
+    /// <summary>
+    /// Tick the low priority group based on its frame interval setting.
+    /// </summary>
     private void TickLowPriorityGroup()
     {
-        _lowFrameCounter++;
-        if (_lowFrameCounter >= _lowPrioritySettings.FrameInterval)
+        _lowPriorityFrameCounter++;
+        if (_lowPriorityFrameCounter >= _lowPrioritySettings.FrameInterval)
         {
-            _lowFrameCounter = 0;
+            _lowPriorityFrameCounter = 0;
             TickGroup(ETickPriority.Low);
         }
     }
 
     private void TickGroup(ETickPriority priority)
     {
-        var tickables = _priorityLists[priority];
+        var tickables = _priorityGroups[priority];
         var settings = _settingsMap[priority];
 
+        if (tickables.Count == 0)
+            return;
 
-        if (tickables.Count == 0) return;
-
-        float startTime = Time.realtimeSinceStartup * 1000f;
+        float frameStartTime = Time.realtimeSinceStartup * 1000f;
         float deltaTime = Time.deltaTime * settings.FrameInterval; // Adjust delta time based on frame interval
         int processed = 0;
         int maxObjects = settings.MaxObjectsPerFrame == -1 ? tickables.Count : settings.MaxObjectsPerFrame;
@@ -310,7 +458,7 @@ public class TickManager : MonoBehaviour
             // Check time budget every 10 iterations for performance
             if (processed > 0 && processed % 10 == 0)
             {
-                float elapsed = (Time.realtimeSinceStartup * 1000f) - startTime;
+                float elapsed = (Time.realtimeSinceStartup * 1000f) - frameStartTime;
                 if (elapsed > settings.TimeBudgetMs)
                 {
                     if (_drawDebug)
@@ -325,7 +473,7 @@ public class TickManager : MonoBehaviour
         if (_drawDebug)
         {
             // Record performance stats
-            float totalTime = (Time.realtimeSinceStartup * 1000f) - startTime;
+            float totalTime = (Time.realtimeSinceStartup * 1000f) - frameStartTime;
             _performanceStats.RecordGroupUpdate(priority, totalTime, processed, tickables.Count);
 
             if (processed > 0)
@@ -337,62 +485,6 @@ public class TickManager : MonoBehaviour
 
     #endregion
 
-    #region Distance Sorting
-
-    private void SortUpdateGroupsByDistance()
-    {
-        if (_player == null)
-            return;
-
-        float startTime = Time.realtimeSinceStartup * 1000f;
-
-        // Clear groups
-        _highPriorityList.Clear();
-        _mediumPriorityList.Clear();
-        _lowPriorityList.Clear();
-
-        Vector3 playerPosition = _player.position;
-
-        // Sort all updatables
-        for (int i = 0; i < _allTickables.Count; i++)
-        {
-            var updatable = _allTickables[i];
-            if (updatable == null || !updatable.IsActive)
-                continue;
-
-            var monoBehaviour = updatable as MonoBehaviour;
-            if (monoBehaviour == null)
-                continue;
-
-            float sqrDistance = (monoBehaviour.transform.position - playerPosition).sqrMagnitude;
-
-            // Assign to appropriate priority group
-            if (sqrDistance < _highDistanceSqr)
-            {
-                _highPriorityList.Add(updatable);
-            }
-            else if (sqrDistance < _mediumDistanceSqr)
-            {
-                _mediumPriorityList.Add(updatable);
-            }
-            else
-            {
-                _lowPriorityList.Add(updatable);
-            }
-        }
-
-
-        if (_drawDebug)
-        {
-            float sortTime = (Time.realtimeSinceStartup * 1000f) - startTime;
-            _performanceStats.RecordSortTime(sortTime);
-
-            Debug.Log($"Groups sorted in {sortTime:F1}ms - High: {_highPriorityList.Count}, " +
-                     $"Medium: {_mediumPriorityList.Count}, Low: {_lowPriorityList.Count}");
-        }
-    }
-
-    #endregion
 
     #region Debug
 
@@ -423,11 +515,15 @@ public class TickManager : MonoBehaviour
         style.fontSize = 12;
         style.normal.textColor = Color.white;
 
+        var lowPriorityList = _priorityGroups[ETickPriority.Low];
+        var mediumPriorityList = _priorityGroups[ETickPriority.Medium];
+        var highPriorityList = _priorityGroups[ETickPriority.High];
+
         var stats = _performanceStats;
         string statsText = $"UpdateManager Performance:\n" +
                           $"Frame Time: {Time.unscaledDeltaTime * 1000f:F1}ms\n" +
                           $"Total Objects: {_allTickables.Count}\n" +
-                          $"High: {_highPriorityList.Count} | Med: {_mediumPriorityList.Count} | Low: {_lowPriorityList.Count}\n" +
+                          $"High: {highPriorityList.Count} | Med: {mediumPriorityList.Count} | Low: {lowPriorityList.Count}\n" +
                           $"Avg Sort Time: {stats.averageSortTime:F1}ms\n" +
                           $"High Avg: {stats.highGroupStats.averageTime:F1}ms\n" +
                           $"Med Avg: {stats.mediumGroupStats.averageTime:F1}ms\n" +
@@ -510,21 +606,23 @@ public struct PerformanceStats
             sortTimes.Dequeue();
 
         float sum = 0f;
-        foreach (float t in sortTimes) sum += t;
+        foreach (float t in sortTimes)
+            sum += t;
+
         averageSortTime = sortTimes.Count > 0 ? sum / sortTimes.Count : 0f;
     }
 
-    public void RecordGroupUpdate(ETickPriority priority, float time, int processed, int total)
+    public void RecordGroupUpdate(TickManager.ETickPriority priority, float time, int processed, int total)
     {
         switch (priority)
         {
-            case ETickPriority.High:
+            case TickManager.ETickPriority.High:
                 highGroupStats.RecordSample(time, processed, total);
                 break;
-            case ETickPriority.Medium:
+            case TickManager.ETickPriority.Medium:
                 mediumGroupStats.RecordSample(time, processed, total);
                 break;
-            case ETickPriority.Low:
+            case TickManager.ETickPriority.Low:
                 lowGroupStats.RecordSample(time, processed, total);
                 break;
         }
