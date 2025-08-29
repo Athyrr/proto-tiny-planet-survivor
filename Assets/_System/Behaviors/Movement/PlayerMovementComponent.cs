@@ -17,6 +17,8 @@ public class PlayerMovementComponent : BaseMovementComponent
     {
         base.Init();
 
+        SetPlanetCenter(FindFirstObjectByType<PlanetComponent>()?.transform);
+
         _speed = _data.Speed;
         _maxSpeed = _data.MaxSpeed;
 
@@ -30,6 +32,8 @@ public class PlayerMovementComponent : BaseMovementComponent
 
     public override bool Move(Vector3 direction, float delta)
     {
+        //Debug.Log($"Move called with direction: {direction}, delta: {delta}");
+
         // Acceleration
         if (direction.magnitude > 0.1f)
         {
@@ -37,7 +41,7 @@ public class PlayerMovementComponent : BaseMovementComponent
             _velocity = Vector3.MoveTowards(_velocity, targetVelocity, _data.Acceleration * delta);
 
             if (!_wasMoving)
-                base.OnMoveStart?.Invoke(gameObject, direction, _velocity.magnitude);
+                base.OnMoveStart?.Invoke(this, direction, _velocity.magnitude);
         }
         // Deceleration
         else
@@ -45,7 +49,9 @@ public class PlayerMovementComponent : BaseMovementComponent
             _velocity = Vector3.MoveTowards(_velocity, Vector3.zero, _data.Deceleration * delta);
 
             if (_velocity.magnitude <= 0.01f && _wasMoving)
-                base.OnMoveEnd?.Invoke(this.gameObject, direction, _velocity.magnitude);
+                base.OnMoveEnd?.Invoke(this, direction, _velocity.magnitude);
+            
+            //Debug.Log("Velocity: " + _velocity);
         }
 
         // Position
@@ -58,7 +64,7 @@ public class PlayerMovementComponent : BaseMovementComponent
         _wasMoving = _velocity.magnitude > 0.01f;
 
         if (_velocity.magnitude > 0.01f)
-            base.OnMoveUpdate?.Invoke(this.gameObject, _velocity.normalized, _velocity.magnitude);
+            base.OnMoveUpdate?.Invoke(this, _velocity.normalized, _velocity.magnitude);
 
         return _velocity.magnitude > 0.01f;
     }

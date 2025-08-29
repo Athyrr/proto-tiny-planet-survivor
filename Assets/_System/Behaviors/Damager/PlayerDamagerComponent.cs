@@ -4,6 +4,9 @@ using UnityEngine;
 public class PlayerDamagerComponent : BaseDamagerComponent
 {
     #region Fields
+
+    public bool AllowAttack;
+
     #endregion
 
 
@@ -24,6 +27,9 @@ public class PlayerDamagerComponent : BaseDamagerComponent
 
     public override bool Attack(float damage)
     {
+        if (!AllowAttack)
+            return false;
+
         Debug.Log("Player Attack");
 
         GetNearbyEnemies();
@@ -31,7 +37,13 @@ public class PlayerDamagerComponent : BaseDamagerComponent
         return true;
     }
 
+    public override bool CanAttack(float damage)
+    {
+        return AllowAttack;
+    }
+
     #endregion
+
 
     #region Private API
 

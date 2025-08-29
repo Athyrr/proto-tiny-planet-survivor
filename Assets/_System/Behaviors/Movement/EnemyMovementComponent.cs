@@ -37,6 +37,8 @@ public class EnemyMovementComponent : BaseMovementComponent
 
         RotateTowardsTarget(_playerTransform, delta);
 
+        OnMoveUpdate?.Invoke(this, direction, _speed);
+
         return true;
     }
 

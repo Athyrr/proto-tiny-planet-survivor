@@ -65,5 +65,7 @@ public abstract class BaseDamagerComponent : MonoBehaviour
         }
     }
 
+    public abstract bool CanAttack(float damage);
+
     #endregion
 }

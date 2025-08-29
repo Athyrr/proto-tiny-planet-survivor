@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class EnemyControllerComponent : MonoBehaviour, ITickable
 {
+    #region Fields
+
     [SerializeField]
     private EnemyMovementComponent _movement = null;
 
@@ -19,12 +21,31 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
 
     private Vector3 _targetDirection = Vector3.zero;
 
-    public bool IsActive => isActiveAndEnabled;
+    #endregion
+
+
+    #region Lifecycle
+
+    private void Awake()
+    {
+        if (_movement == null)
+            _movement = GetComponent<EnemyMovementComponent>();
+        if (_damager == null)
+            _damager = GetComponent<EnemyDamagerComponent>();
+        //if (_ai == null)
+        //    _ai = GetComponent<EnemyAIComponent>();
+        //if (_damageable == null)
+        //    _damageable = GetComponent<EnemyDamageableComponent>();
+    }
 
     private void Start()
     {
         TickManager tm = FindFirstObjectByType<TickManager>();
         tm.Register(this);
+
+        var player = FindFirstObjectByType<PlayerControllerComponent>();
+        if (_target == null && player != null)
+            _target = player.transform;
     }
 
     private void OnEnable()
@@ -35,6 +56,15 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
         if (_damager == null)
             Debug.LogError($"{nameof(EnemyDamagerComponent)} component field is empty.");
     }
+
+    #endregion
+
+
+    #region Public API
+
+    public Vector3 Position => transform.position;
+
+    public bool IsActive => isActiveAndEnabled;
 
     public void Tick(float deltaTime)
     {
@@ -50,4 +80,6 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     {
         _target = player;
     }
+
+    #endregion
 }

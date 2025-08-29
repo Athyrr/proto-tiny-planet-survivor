@@ -6,9 +6,6 @@ using UnityEngine;
 public class EnemyDamagerComponent : BaseDamagerComponent
 {
     #region Fields
-
-
-
     #endregion
 
 
@@ -30,6 +27,11 @@ public class EnemyDamagerComponent : BaseDamagerComponent
     public override bool Attack(float damage)
     {
         Debug.Log("Enemy Attack");
+        return true;
+    }
+
+    public override bool CanAttack(float damage)
+    {
         return true;
     }
 

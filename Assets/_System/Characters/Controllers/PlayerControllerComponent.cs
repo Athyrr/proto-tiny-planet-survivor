@@ -16,6 +16,9 @@ public class PlayerControllerComponent : MonoBehaviour
     private PlayerDamagerComponent _damager = null;
 
     [SerializeField]
+    private Transform _planetCenter = null;
+
+    [SerializeField]
     private LayerMask _pointTargetLayer = ~0;
 
     private GameInputs _gameInputs = null;
@@ -29,6 +32,8 @@ public class PlayerControllerComponent : MonoBehaviour
     {
         if (_movement == null)
             Debug.LogError($"{typeof(PlayerMovementComponent)} component field is empty.");
+
+        _movement.SetPlanetCenter(_planetCenter);
     }
 
     private void OnEnable()
@@ -68,20 +73,24 @@ public class PlayerControllerComponent : MonoBehaviour
 
     private void HandlePointInput(InputAction.CallbackContext context)
     {
-        Ray cameraRay = Camera.main.ScreenPointToRay(context.ReadValue<Vector2>());
+        Ray cameraRay = _camera.ScreenPointToRay(context.ReadValue<Vector2>());
 
         if (Physics.Raycast(cameraRay, out RaycastHit hitInfo, Mathf.Infinity, _pointTargetLayer))
         {
             _worldAimPoint = hitInfo.point;
 
-            Vector3 aimDirection = hitInfo.point - transform.position;
-            if (aimDirection != Vector3.zero)
-                aimDirection.Normalize();
+            Vector3 aimDirection = GetTangentialDirection(transform.position, hitInfo.point);
 
-            _aimDirection = new Vector2(aimDirection.x, aimDirection.y);
+            if (aimDirection.sqrMagnitude > 0.01f)
+                _aimDirection = new Vector2(aimDirection.x, aimDirection.z);
         }
+    }
 
-        //Debug.Log("Point Input: " + _worldAimPoint);
+    private Vector3 GetTangentialDirection(Vector3 from, Vector3 to)
+    {
+        Vector3 planetNormal = _movement.GetPlanetNormal(from);
+        Vector3 direction = (to - from);
+        return Vector3.ProjectOnPlane(direction, planetNormal).normalized;
     }
 
     private void UpdateMovement(Vector2 input, float delta)
@@ -93,14 +102,26 @@ public class PlayerControllerComponent : MonoBehaviour
 
         if (_useWorldSpace)
         {
+            // World relative movement
             movementDirection = new Vector3(input.x, 0, input.y);
+
+            // Project movement direction onto the planet surface
+            Vector3 planetNormal = _movement.GetPlanetNormal(transform.position);
+            movementDirection = Vector3.ProjectOnPlane(movementDirection, planetNormal);
         }
         else
         {
+            // Camera relative movement
             Vector3 right = _camera.transform.right;
             Vector3 forward = _camera.transform.forward;
 
+            // Project camera vectors onto the planet surface
+            Vector3 planetNormal = _movement.GetPlanetNormal(transform.position);
+            right = Vector3.ProjectOnPlane(right, planetNormal);
+            forward = Vector3.ProjectOnPlane(forward, planetNormal);
+
             movementDirection = right * input.x + forward * input.y;
+
         }
 
         movementDirection.Normalize();
