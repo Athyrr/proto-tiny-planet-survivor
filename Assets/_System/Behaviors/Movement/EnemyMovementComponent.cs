@@ -29,13 +29,14 @@ public class EnemyMovementComponent : BaseMovementComponent
 
     public override bool Move(Vector3 direction, float delta)
     {
-        _velocity = Vector3.MoveTowards(_velocity, direction * _speed, _speed * delta);
-        transform.position += _velocity * delta;
+        direction.Normalize();
+
+        _velocity = Vector3.MoveTowards(_velocity, direction * _speed, _data.Acceleration * delta);
 
         ApplyMovementToPlanet(delta, out _);
         AlignWithPlanet();
 
-        RotateTowardsTarget(_playerTransform, delta);
+        //RotateTowardsTarget(_playerTransform, delta);
 
         OnMoveUpdate?.Invoke(this, direction, _speed);
 
@@ -56,7 +57,7 @@ public class EnemyMovementComponent : BaseMovementComponent
         if (target == null)
             return;
 
-        Vector3 planetNormal = GetPlanetNormal(transform.position);
+        Vector3 planetNormal = _planet.GetNormalAtPosition(transform.position);
         Vector3 targetDir = target.transform.position - transform.position;
 
         Vector3 projectedTargetDirection = Vector3.ProjectOnPlane(targetDir, planetNormal);

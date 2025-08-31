@@ -17,8 +17,6 @@ public class PlayerMovementComponent : BaseMovementComponent
     {
         base.Init();
 
-        SetPlanetCenter(FindFirstObjectByType<PlanetComponent>()?.transform);
-
         _speed = _data.Speed;
         _maxSpeed = _data.MaxSpeed;
 
@@ -32,8 +30,6 @@ public class PlayerMovementComponent : BaseMovementComponent
 
     public override bool Move(Vector3 direction, float delta)
     {
-        //Debug.Log($"Move called with direction: {direction}, delta: {delta}");
-
         // Acceleration
         if (direction.magnitude > 0.1f)
         {
@@ -50,14 +46,9 @@ public class PlayerMovementComponent : BaseMovementComponent
 
             if (_velocity.magnitude <= 0.01f && _wasMoving)
                 base.OnMoveEnd?.Invoke(this, direction, _velocity.magnitude);
-            
-            //Debug.Log("Velocity: " + _velocity);
         }
 
-        // Position
-        ApplyMovementToPlanet(delta, out Vector3 finalPosition);
-
-        // Rotation
+        ApplyMovementToPlanet(delta, out _);
         AlignWithPlanet();
 
         _previousDirection = direction;
@@ -76,8 +67,11 @@ public class PlayerMovementComponent : BaseMovementComponent
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, transform.position + GetPlanetNormal(transform.position) * 5f);
+        if (_planet != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + _planet.GetNormalAtPosition(transform.position) * 5f);
+        }
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * 2f);

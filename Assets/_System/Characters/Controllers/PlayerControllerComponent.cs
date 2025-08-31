@@ -16,9 +16,6 @@ public class PlayerControllerComponent : MonoBehaviour
     private PlayerDamagerComponent _damager = null;
 
     [SerializeField]
-    private Transform _planetCenter = null;
-
-    [SerializeField]
     private LayerMask _pointTargetLayer = ~0;
 
     private GameInputs _gameInputs = null;
@@ -28,12 +25,14 @@ public class PlayerControllerComponent : MonoBehaviour
 
     private Vector3 _inputDirection = Vector3.zero;
 
+    private PlanetComponent _planet = null;
+
     private void Awake()
     {
         if (_movement == null)
             Debug.LogError($"{typeof(PlayerMovementComponent)} component field is empty.");
 
-        _movement.SetPlanetCenter(_planetCenter);
+        _planet = FindFirstObjectByType<PlanetComponent>();
     }
 
     private void OnEnable()
@@ -88,7 +87,7 @@ public class PlayerControllerComponent : MonoBehaviour
 
     private Vector3 GetTangentialDirection(Vector3 from, Vector3 to)
     {
-        Vector3 planetNormal = _movement.GetPlanetNormal(from);
+        Vector3 planetNormal = _planet.GetNormalAtPosition(from);
         Vector3 direction = (to - from);
         return Vector3.ProjectOnPlane(direction, planetNormal).normalized;
     }
@@ -106,7 +105,7 @@ public class PlayerControllerComponent : MonoBehaviour
             movementDirection = new Vector3(input.x, 0, input.y);
 
             // Project movement direction onto the planet surface
-            Vector3 planetNormal = _movement.GetPlanetNormal(transform.position);
+            Vector3 planetNormal = _planet.GetNormalAtPosition(transform.position);
             movementDirection = Vector3.ProjectOnPlane(movementDirection, planetNormal);
         }
         else
@@ -116,7 +115,7 @@ public class PlayerControllerComponent : MonoBehaviour
             Vector3 forward = _camera.transform.forward;
 
             // Project camera vectors onto the planet surface
-            Vector3 planetNormal = _movement.GetPlanetNormal(transform.position);
+            Vector3 planetNormal = _planet.GetNormalAtPosition(transform.position);
             right = Vector3.ProjectOnPlane(right, planetNormal);
             forward = Vector3.ProjectOnPlane(forward, planetNormal);
 

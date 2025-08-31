@@ -15,6 +15,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField]
     private PlayerControllerComponent _player;
 
+    private PlanetData _planetData;
 
 
     private void Start()
@@ -26,6 +27,14 @@ public class WaveManager : MonoBehaviour
     }
 
 
+
+    public void Init(PlanetData data)
+    {
+        _planetData = data;
+
+
+
+    }
 
     private void SpawnEnemy()
     {
