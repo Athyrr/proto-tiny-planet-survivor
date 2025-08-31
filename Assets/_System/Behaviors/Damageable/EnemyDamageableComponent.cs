@@ -23,14 +23,24 @@ public class EnemyDamageableComponent : BaseDamageableComponent
 
         if (_health <= 0)
         {
-            Destroy(this.gameObject);
-            Debug.Log("Enemy destroyed");
+            Kill();
         }
         return true;
     }
 
-    private void OnDestroy()
+    private bool Kill()
     {
-        FindAnyObjectByType<TickManager>().Unregister(this.GetComponent<EnemyControllerComponent>());
+        var tm = FindAnyObjectByType<TickManager>();
+        var tickable = GetComponent<ITickable>();
+
+        if (tm == null || tickable == null)
+            Destroy(this.gameObject);
+
+        tm.Unregister(tickable);
+        Destroy(this.gameObject);
+
+        Debug.Log("Enemy destroyed");
+        return true;
     }
+
 }

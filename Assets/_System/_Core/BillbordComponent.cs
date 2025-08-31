@@ -40,12 +40,21 @@ public class BillboardComponent : MonoBehaviour
     /// </summary>
     private void FaceCamera()
     {
+        if (_camera == null)
+            return;
+
         Vector3 forward = _invertForward
             ? _camera.transform.forward
             : -_camera.transform.forward;
 
-        Vector3 upwards = _useCameraUpwards ? _camera.transform.up: Vector3.up;
+        Vector3 upwards = _useCameraUpwards ? _camera.transform.up : Vector3.up;
 
         transform.rotation = Quaternion.LookRotation(forward, upwards);
+    }
+
+
+    private void OnValidate()
+    {
+        FaceCamera();
     }
 }
