@@ -21,6 +21,8 @@ public class PlanetComponent : MonoBehaviour
         _radius = transform.localScale.x * 0.5f;
     }
 
+    public float Radius => _radius;
+
     public Vector3 GetNormalAtPosition(Vector3 position)
     {
         bool timeDirty = Time.time - _lastNormalUpdate > 0.05f; // 5 frames threshold
@@ -68,7 +70,8 @@ public class PlanetComponent : MonoBehaviour
     {
         Vector3 direction = (position - transform.position).normalized;
 
-        Vector3 snapped = transform.position + (direction * _radius);
+        //Vector3 snapped = transform.position + (direction * _radius);
+        Vector3 snapped = transform.position + (direction * transform.localScale.x * 0.5f);
         Vector3 normal = GetNormalAtPosition(snapped);
         return snapped + normal * offset;  // @todo add terrain height map
     }

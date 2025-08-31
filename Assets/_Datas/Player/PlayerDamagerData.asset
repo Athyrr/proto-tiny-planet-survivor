@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b311b4d94ca97f4f8b2d88c5d9b1fde, type: 3}
   m_Name: PlayerDamagerData
   m_EditorClassIdentifier: 
-  Damage: 20
+  Damage: 50
   AttackRadius: 8
-  Cooldown: 1
+  Cooldown: 0.5
   TargetLayer:
     serializedVersion: 2
     m_Bits: 128

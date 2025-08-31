@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerDamagerComponent : BaseDamagerComponent
@@ -15,8 +16,6 @@ public class PlayerDamagerComponent : BaseDamagerComponent
     protected override bool Init()
     {
         base.Init();
-
-        Debug.Log("Player Damager Init" + Data.Damage);
         return true;
     }
 
@@ -29,9 +28,6 @@ public class PlayerDamagerComponent : BaseDamagerComponent
     {
         if (!AllowAttack)
             return false;
-
-        Debug.Log("Player Attack");
-
         GetNearbyEnemies();
 
         return true;
@@ -51,10 +47,10 @@ public class PlayerDamagerComponent : BaseDamagerComponent
     {
         var colliders = Physics.OverlapSphere(transform.position, Data.AttackRadius, Data.TargetLayer);
 
-        foreach (var c in colliders)
-        {
-            c.GetComponent<EnemyDamageableComponent>().TakeDamage(this, Data.Damage);
-        }
+        if (colliders.Length <= 0)
+            return;
+
+        colliders[0].GetComponent<EnemyDamageableComponent>().TakeDamage(this, Data.Damage);
 
     }
 

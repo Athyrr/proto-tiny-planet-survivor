@@ -166,7 +166,7 @@ Transform:
   m_GameObject: {fileID: 3696109521651881084}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -190,7 +190,6 @@ MonoBehaviour:
   _camera: {fileID: 6442665934863022827}
   _movement: {fileID: 7447786827456265221}
   _damager: {fileID: 1245920828126245406}
-  _planetCenter: {fileID: 0}
   _pointTargetLayer:
     serializedVersion: 2
     m_Bits: 8

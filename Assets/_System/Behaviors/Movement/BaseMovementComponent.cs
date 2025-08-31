@@ -78,5 +78,21 @@ public abstract class BaseMovementComponent : MonoBehaviour
         transform.position = finalPosition;
     }
 
+    private void OnValidate()
+    {
+        if (_planet == null)
+            _planet = FindFirstObjectByType<PlanetComponent>();
+
+        if (_planet != null && !Application.isPlaying)
+        {
+                        transform.position = _planet.GetSnappedPosition(transform.position);
+            AlignWithPlanet();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        }
+    }
+
     #endregion
 }

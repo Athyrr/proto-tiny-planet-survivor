@@ -19,6 +19,8 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     [SerializeField]
     protected Transform _target = null;
 
+    private PlanetComponent _planet = null;
+
     private Vector3 _targetDirection = Vector3.zero;
 
     #endregion
@@ -78,6 +80,12 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
 
     public void SetTarget(Transform player)
     {
+        _target = player;
+    }
+
+    public void Setup(PlanetComponent planet, Transform player)
+    {
+        _planet = planet;
         _target = player;
     }
 

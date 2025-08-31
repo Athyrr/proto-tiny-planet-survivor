@@ -17,7 +17,7 @@ public class EnemyDamageableComponent : BaseDamageableComponent
 
         _health -= amount;
 
-        Debug.Log($"Enemy took {amount} damage from {source.name}. Health: {_health}");
+        //Debug.Log($"Enemy took {amount} damage from {source.name}. Health: {_health}");
 
         //OnHealthChange.Invoke(_health + amount, _data.MaxHealth, this);
 
