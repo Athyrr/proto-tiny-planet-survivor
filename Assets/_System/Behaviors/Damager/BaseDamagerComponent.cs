@@ -51,15 +51,14 @@ public abstract class BaseDamagerComponent : MonoBehaviour
     public void UpdateTimer(float delta)
     {
         _timer += delta;
-
         if (_timer >= _cooldown)
         {
             _timer = _cooldown;
 
             if (!_canAttack)
-            {
                 return;
-            }
+
+
             Attack(_damage);
             _timer = 0f;
         }

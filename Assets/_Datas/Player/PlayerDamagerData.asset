@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: PlayerDamagerData
   m_EditorClassIdentifier: 
   Damage: 50
-  AttackRadius: 8
+  AttackRadius: 15
   Cooldown: 0.5
   TargetLayer:
     serializedVersion: 2
     m_Bits: 128
+  DebugColor: {r: 0.67490077, g: 0.22748311, b: 0.6792453, a: 1}

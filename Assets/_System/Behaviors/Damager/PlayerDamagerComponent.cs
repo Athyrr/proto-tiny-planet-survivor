@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerDamagerComponent : BaseDamagerComponent
@@ -28,6 +26,11 @@ public class PlayerDamagerComponent : BaseDamagerComponent
     {
         if (!AllowAttack)
             return false;
+
+        if (this.TryGetComponentInChildren<SkillFeedbackComponent>(out var feedback))
+        {
+            feedback.PlayFeedback();
+        }
         GetNearbyEnemies();
 
         return true;
@@ -50,8 +53,13 @@ public class PlayerDamagerComponent : BaseDamagerComponent
         if (colliders.Length <= 0)
             return;
 
-        colliders[0].GetComponent<EnemyDamageableComponent>().TakeDamage(this, Data.Damage);
+        foreach (var col in colliders)
+        {
+            if (!col.TryGetComponent<EnemyDamageableComponent>(out var enemy))
+                continue;
 
+            enemy.TakeDamage(this, Data.Damage);
+        }
     }
 
     #endregion
@@ -61,7 +69,7 @@ public class PlayerDamagerComponent : BaseDamagerComponent
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Data.DebugColor;
         Gizmos.DrawWireSphere(transform.position, Data.AttackRadius);
     }
 

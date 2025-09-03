@@ -24,18 +24,26 @@ public class PlanetArenaManager : MonoBehaviour
 
     #region Fields
 
+    [SerializeField]
+    private PlayerControllerComponent _player;
+
+    [SerializeField]
+    private PlanetComponent _planet;
+
+    ///<inheritdoc cref="PlanetData"/>
+    [SerializeField]
     private PlanetData _planetData;
+
+    /// <inheritdoc cref="WaveManager"/>
+    [SerializeField]
+    private WaveManager _waveManager;
+
+    ///<inheritdoc cref="EnemiesSpawnManager"/>
+    [SerializeField]
+    private EnemiesSpawnManager _enemiesManager;
 
     private float _timer;
     private bool _isTimerRunning;
-
-    // Wave manager 
-
-    private WaveManager _waveManager;
-
-    private EnemiesSpawnManager _enemiesManager;
-
-    private Transform _player;
 
     #endregion
 
@@ -44,7 +52,6 @@ public class PlanetArenaManager : MonoBehaviour
 
     private void Awake()
     {
-
         _waveManager = FindFirstObjectByType<WaveManager>();
         _enemiesManager = FindFirstObjectByType<EnemiesSpawnManager>();
 
@@ -59,13 +66,27 @@ public class PlanetArenaManager : MonoBehaviour
 
     private void Start()
     {
-        _waveManager.LaunchWaves();
+        _waveManager.StartArenaWaves();
     }
+
     private void Update()
     {
         float delta = Time.deltaTime;
-        if (_waveManager.IsAWaveRunning)
+
+        if (_waveManager.IsRunningWave)
             _waveManager.UpdateWave(delta);
+    }
+
+    private void OnEnable()
+    {
+        if (_waveManager != null)
+            _waveManager.OnWaveStart += HandleNextWave;
+    }
+
+    private void OnDisable()
+    {
+        if (_waveManager != null)
+            _waveManager.OnWaveStart -= HandleNextWave;
     }
 
     #endregion
@@ -87,17 +108,6 @@ public class PlanetArenaManager : MonoBehaviour
     }
 
 
-    private void OnEnable()
-    {
-        if (_waveManager != null)
-            _waveManager.OnWaveStart += HandleNextWave;
-    }
-
-    private void OnDisable()
-    {
-        if (_waveManager != null)
-            _waveManager.OnWaveStart -= HandleNextWave;
-    }
     #endregion
 
 
@@ -105,11 +115,14 @@ public class PlanetArenaManager : MonoBehaviour
 
     private void InitManagers()
     {
-        var planet = FindFirstObjectByType<PlanetComponent>();
-        var player = FindFirstObjectByType<PlayerControllerComponent>();
+        if (_planet == null)
+            _planet = FindFirstObjectByType<PlanetComponent>();
 
-        _enemiesManager.Init(_planetData, player?.transform, planet);
-        _waveManager.Init(_planetData);
+        if (_player == null)
+            _player = FindFirstObjectByType<PlayerControllerComponent>();
+
+        _enemiesManager.Initialize(_planetData, _planet, _player);
+        _waveManager.Initialize(_planetData, _planet, _player);
     }
 
     #endregion

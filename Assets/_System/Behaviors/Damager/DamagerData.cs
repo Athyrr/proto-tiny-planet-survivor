@@ -14,4 +14,6 @@ public class DamagerData : ScriptableObject
     public float Cooldown = 0f;
 
     public LayerMask TargetLayer = ~0;
+
+    public Color DebugColor = Color.clear;
 }

@@ -2,7 +2,10 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-public class EnemiesSpawnManager : MonoBehaviour
+/// <summary>
+/// Handles spawning of enemies on the planet. Used by <see cref="PlanetArenaManager"/>.
+/// </summary>
+public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
 {
     #region Delegates
 
@@ -18,7 +21,7 @@ public class EnemiesSpawnManager : MonoBehaviour
     [Min(1)]
     private int _maxEnemies = 10;
 
-    private Transform _player = null;
+    private PlayerControllerComponent _player = null;
     private PlanetData _planetData = null;
     private PlanetComponent _planet;
 
@@ -26,13 +29,33 @@ public class EnemiesSpawnManager : MonoBehaviour
 
     private Coroutine _spawnCoroutine = null;
 
+    private bool _isManagerIntialized;
+
+    public bool IsManagerIntialized => _isManagerIntialized;
+
     #endregion
 
 
     #region Public API
 
+    public bool Initialize(PlanetData planetData, PlanetComponent planet, PlayerControllerComponent player)
+    {
+        _planetData = planetData;
+        _player = player;
+        _planet = planet;
+
+        _isManagerIntialized =  _player != null && _planet != null;
+        return _isManagerIntialized;
+    }
+
     public void SpawnWaveEnemies(Wave wave)
     {
+        if (!_isManagerIntialized)
+        {
+            Debug.LogError($"{nameof(EnemiesSpawnManager)}  is not initialized.");
+            return;
+        }
+
         if (wave == null || wave.EnemiesToSpawn == null || wave.EnemiesToSpawn.Length <= 0)
         {
             Debug.LogWarning("Wave data is invalid or empty.");
@@ -104,7 +127,7 @@ public class EnemiesSpawnManager : MonoBehaviour
 
         float distance = Random.Range(spawnInfo.MinSpawnDistanceFromPlayer, spawnInfo.MaxSpawnDistanceFromPlayer);
         Vector3 direction = Random.onUnitSphere.normalized;
-        return _planet.GetSurfaceStep(_player.position, _player.position + direction, distance);
+        return _planet.GetSurfaceStep(_player.transform.position, _player.transform.position + direction, distance);
     }
 
     // Random position on planet
@@ -131,9 +154,9 @@ public class EnemiesSpawnManager : MonoBehaviour
             Debug.LogWarning("Nulllllllllll");
 
         var instance = Instantiate(enemy, position, Quaternion.identity); // @todo use Pooling instead
-       
+
         var instanceComponent = instance.GetComponent<EnemyControllerComponent>();
-        instanceComponent.Setup(_planet, _player);
+        instanceComponent.Setup(_planet, _player.transform);
 
 
         _enemies.Add(instanceComponent);
@@ -143,13 +166,6 @@ public class EnemiesSpawnManager : MonoBehaviour
     private bool CanSpawn()
     {
         return _enemies.Count < _maxEnemies;
-    }
-
-    public void Init(PlanetData data, Transform player, PlanetComponent planet)
-    {
-        _planetData = data;
-        _player = player;
-        _planet = planet;
     }
 
     #endregion
