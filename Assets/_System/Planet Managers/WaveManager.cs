@@ -1,8 +1,11 @@
 using System.Collections;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
-public class WaveManager : MonoBehaviour
+
+/// <summary>
+/// Handles the sequencing and management of enemy waves in the game.
+/// </summary>
+public class WaveManager : MonoBehaviour, IArenaManager
 {
     #region Delegates
 
@@ -39,66 +42,84 @@ public class WaveManager : MonoBehaviour
     private float _timeBetweenWaves = 1f;
 
     private PlanetData _planetData;
+
     private float _waveTimer = 0f;
+
     private int _waveIndex = 0;
+
     private bool _waitForNextWave = false;
+
+    private bool _hasArenaStarted = false;
+
+    private bool _hasArenaFinished = false;
+
+    ///<inheritdoc cref=" IArenaManager.IsManagerIntialized"/>
+    private bool _isManagerIntialized;
 
     #endregion
 
 
     #region Lifecycle
 
-    private void Awake()
-    {
-        if (_player == null)
-            Debug.LogError($"{typeof(PlayerControllerComponent)} reference is missing.");
-    }
-
-
     #endregion
 
 
     #region Public API  
 
+    ///<inheritdoc cref=" IArenaManager.IsManagerIntialized"/>
+    public bool IsManagerIntialized => _isManagerIntialized;
+
     public int WaveIndex => _waveIndex;
+
     public Wave CurrentWave => _waves[_waveIndex];
 
     public int TotalWaves => _waves.Length;
 
-    public bool IsAWaveRunning => _waveIndex >= 0 && _waveIndex < _waves.Length;
+    public bool IsRunningWave => _waveIndex >= 0 && _waveIndex < _waves.Length;
 
-    public void Init(PlanetData data)
+    public bool HasArenaStarted => _hasArenaStarted;
+
+    public bool Initialize(PlanetData planetData, PlanetComponent _, PlayerControllerComponent player)
     {
-        _planetData = data;
+        _player = player;
+        _planetData = planetData;
+
         _waveTimer = 0f;
         _waveTimer = 0f;
         _waitForNextWave = false;
+
+        _isManagerIntialized =  _player != null;
+        return _isManagerIntialized;
+    }
+
+    public void StartArenaWaves()
+    {
+        if (!IsManagerIntialized)
+        {
+            Debug.LogError($"{nameof(WaveManager)}  is not initialized.");
+            return;
+        }
+
+        NextWave();
     }
 
     public void NextWave()
     {
-        Debug.Log("Next Wave");
-        SetupWave(_waveIndex);
-    }
+        if (_hasArenaFinished)
+            return;
 
-    public void LaunchWaves()
-    {
-        SetupWave(0);
-    }
-
-    public bool SetupWave(int waveIndex)
-    {
-        if (waveIndex < 0 || waveIndex >= _waves.Length)
+        if (!_hasArenaStarted)
         {
-            Debug.LogError($"Wave index {waveIndex} is out of range.");
-            return false;
+            StartWave(0);
+            _hasArenaStarted = true;
+            _hasArenaFinished = false;
+            Debug.Log("First Wave");
+
+            return;
         }
 
-        Wave wave = _waves[waveIndex];
-        if (wave == null)
-            return false;
-
-        return SetupWave(wave);
+        Debug.Log("Next Wave");
+        StartWave(_waveIndex);
     }
 
     public void UpdateWave(float delta)
@@ -120,10 +141,10 @@ public class WaveManager : MonoBehaviour
             OnWaveEnd?.Invoke(_waveIndex);
 
             _waveIndex++;
-
             if (_waveIndex >= _waves.Length)
             {
                 AllWavesCompleted();
+                return;
             }
             else
             {
@@ -137,6 +158,41 @@ public class WaveManager : MonoBehaviour
     {
         Debug.Log("All waves completed!");
         OnAllWavesCompleted?.Invoke();
+        _hasArenaFinished = true;
+    }
+
+
+    #endregion
+
+
+    #region Private API
+
+    private bool StartWave(Wave wave)
+    {
+        if (wave == null)
+            return false;
+
+        _waveTimer = 0;
+
+        Debug.Log("Starting wave " + (_waveIndex + 1) + " / " + _waves.Length);
+        OnWaveStart?.Invoke(CurrentWave);
+
+        return true;
+    }
+
+    private bool StartWave(int waveIndex)
+    {
+        if (waveIndex < 0 || waveIndex >= _waves.Length)
+        {
+            Debug.LogError($"Wave index {waveIndex} is out of range.");
+            return false;
+        }
+
+        Wave wave = _waves[waveIndex];
+        if (wave == null)
+            return false;
+
+        return StartWave(wave);
     }
 
     private IEnumerator WaitForWaveCoroutine(int waveIndex)
@@ -148,27 +204,8 @@ public class WaveManager : MonoBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
-        SetupWave(_waveIndex);
+        StartWave(_waveIndex);
 
-    }
-
-    #endregion
-
-
-    #region Private API
-
-    private bool SetupWave(Wave wave)
-    {
-        if (wave == null)
-            return false;
-
-        _waveTimer = 0;
-
-        OnWaveStart?.Invoke(CurrentWave);
-
-        Debug.Log("Starting wave " + (_waveIndex + 1) + " / " + _waves.Length);
-
-        return true;
     }
 
     #endregion
