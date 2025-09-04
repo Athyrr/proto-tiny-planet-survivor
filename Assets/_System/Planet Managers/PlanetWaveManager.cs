@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Handles the sequencing and management of enemy waves in the game.
 /// </summary>
-public class WaveManager : MonoBehaviour, IArenaManager
+public class PlanetWaveManager : MonoBehaviour, IArenaManager
 {
     #region Delegates
 
@@ -23,6 +23,7 @@ public class WaveManager : MonoBehaviour, IArenaManager
 
     #endregion
 
+    //@todo Add ref to Enemies Manager and use it in Wave manager to spawn entities
 
     #region Fields
 
@@ -96,7 +97,7 @@ public class WaveManager : MonoBehaviour, IArenaManager
     {
         if (!IsManagerIntialized)
         {
-            Debug.LogError($"{nameof(WaveManager)}  is not initialized.");
+            Debug.LogError($"{nameof(PlanetWaveManager)}  is not initialized.");
             return;
         }
 

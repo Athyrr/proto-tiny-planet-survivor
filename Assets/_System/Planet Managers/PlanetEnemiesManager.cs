@@ -3,11 +3,16 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Handles spawning of enemies on the planet. Used by <see cref="PlanetArenaManager"/>.
+/// Manages enemy instances in the played planet.
 /// </summary>
-public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
+/// <remarks>It is also responsible to spawn enemies in the scene and assign their base stats, taking account of the current
+/// arena level.</remarks>
+public class PlanetEnemiesManager : MonoBehaviour, IArenaManager
 {
     #region Delegates
+
+    public delegate void SpawnEnemyDelegate(EnemyControllerComponent enemy);
+    public event SpawnEnemyDelegate OnSpawnEnemy;
 
     public delegate void EnemyKilledDelegate(EnemyControllerComponent enemy);
     public event EnemyKilledDelegate OnEnemyKilled;
@@ -19,10 +24,12 @@ public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
 
     [SerializeField]
     [Min(1)]
-    private int _maxEnemies = 10;
+    private int _maxEnemies = 800;
 
     private PlayerControllerComponent _player = null;
+    
     private PlanetData _planetData = null;
+
     private PlanetComponent _planet;
 
     private List<EnemyControllerComponent> _enemies = new List<EnemyControllerComponent>();
@@ -44,7 +51,7 @@ public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
         _player = player;
         _planet = planet;
 
-        _isManagerIntialized =  _player != null && _planet != null;
+        _isManagerIntialized = _player != null && _planet != null;
         return _isManagerIntialized;
     }
 
@@ -52,7 +59,7 @@ public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
     {
         if (!_isManagerIntialized)
         {
-            Debug.LogError($"{nameof(EnemiesSpawnManager)}  is not initialized.");
+            Debug.LogError($"{nameof(PlanetEnemiesManager)}  is not initialized.");
             return;
         }
 
@@ -62,6 +69,10 @@ public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
             return;
         }
 
+        if (_spawnCoroutine != null)
+        {
+            StopCoroutine(_spawnCoroutine);
+        }
         _spawnCoroutine = StartCoroutine(SpawnWaveEnemiesCoroutine(wave));
     }
 
@@ -83,6 +94,8 @@ public class EnemiesSpawnManager : MonoBehaviour, IArenaManager
                 yield return new WaitForSeconds(wave.DelayBetweenSpawns);
             }
         }
+
+        _spawnCoroutine = null;
     }
 
     #endregion

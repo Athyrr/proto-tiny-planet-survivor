@@ -44,12 +44,12 @@ public class SkillFeedbackComponent : MonoBehaviour
         if (_spriteRenderer == null)
             return false;
 
-        if (_attackFeedbackCoroutine != null)
-        {
-            StopCoroutine(_attackFeedbackCoroutine);
-        }
+        //if (_attackFeedbackCoroutine != null)
+        //{
+        //    StopCoroutine(_attackFeedbackCoroutine);
+        //}
 
-        _attackFeedbackCoroutine = StartCoroutine(AttackFeedback());
+       /* _attackFeedbackCoroutine =*/ StartCoroutine(AttackFeedback());
         return true;
     }
 

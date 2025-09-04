@@ -312,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c3f03309b65d844baba7ad24b1d2971, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxEnemies: 500
+  _maxEnemies: 1000
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,21 +483,21 @@ MonoBehaviour:
   _highPriorityDistance: 40
   _mediumPriorityDistance: 90
   _cullingDistance: 180
-  _sortInterval: 5
+  _sortInterval: 0.5
   _highPrioritySettings:
     FrameInterval: 1
     TimeBudgetMs: 8
-    MaxObjectsPerFrame: 50
+    MaxObjectsPerFrame: 200
   _mediumPrioritySettings:
     FrameInterval: 3
     TimeBudgetMs: 5
-    MaxObjectsPerFrame: 100
+    MaxObjectsPerFrame: 200
   _lowPrioritySettings:
-    FrameInterval: 5
+    FrameInterval: 6
     TimeBudgetMs: 3
-    MaxObjectsPerFrame: 250
-  _drawDebug: 1
-  _showPerformanceStats: 1
+    MaxObjectsPerFrame: -1
+  _drawDebug: 0
+  _showPerformanceStats: 0
 --- !u!1 &725579031
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,16 +871,16 @@ MonoBehaviour:
   _player: {fileID: 1862036524}
   _waves:
   - Duration: 30
-    DelayBetweenSpawns: 1
+    DelayBetweenSpawns: 0.1
     EnemiesToSpawn:
     - EnemyPrefab: {fileID: 2390054388805238810, guid: b10f3e9cd137b954486a83d1ae0ad4a2, type: 3}
-      Count: 100
+      Count: 500
       SpawnType: 0
       SpawnPoints: []
       MinSpawnDistanceFromPlayer: 50
       MaxSpawnDistanceFromPlayer: 70
     - EnemyPrefab: {fileID: 2390054388805238810, guid: 713753d779e8b254d864dbfbfe7a291e, type: 3}
-      Count: 80
+      Count: 200
       SpawnType: 0
       SpawnPoints: []
       MinSpawnDistanceFromPlayer: 50
@@ -928,16 +928,16 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   - Duration: 30
-    DelayBetweenSpawns: 0.5
+    DelayBetweenSpawns: 0.1
     EnemiesToSpawn:
     - EnemyPrefab: {fileID: 2390054388805238810, guid: 713753d779e8b254d864dbfbfe7a291e, type: 3}
-      Count: 500
+      Count: 1000
       SpawnType: 0
       SpawnPoints: []
       MinSpawnDistanceFromPlayer: 60
       MaxSpawnDistanceFromPlayer: 80
     - EnemyPrefab: {fileID: 2390054388805238810, guid: b10f3e9cd137b954486a83d1ae0ad4a2, type: 3}
-      Count: 40
+      Count: 1000
       SpawnType: 0
       SpawnPoints: []
       MinSpawnDistanceFromPlayer: 50
@@ -984,7 +984,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  _timeBetweenWaves: 0
+  _timeBetweenWaves: 10
 --- !u!114 &1862036524 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6674628553766824082, guid: d823073396bfe7d4b85873e5133c3b3b, type: 3}
@@ -1143,6 +1143,10 @@ PrefabInstance:
     - target: {fileID: 522152495434600363, guid: d823073396bfe7d4b85873e5133c3b3b, type: 3}
       propertyPath: m_LocalRotation.z
       value: -0.42261833
+      objectReference: {fileID: 0}
+    - target: {fileID: 1245920828126245406, guid: d823073396bfe7d4b85873e5133c3b3b, type: 3}
+      propertyPath: AllowAttack
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2914864429189336712, guid: d823073396bfe7d4b85873e5133c3b3b, type: 3}
       propertyPath: m_LocalPosition.x

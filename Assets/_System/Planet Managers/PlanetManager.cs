@@ -1,9 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// Handles the planet arena state, progression, victory/defeat conditions and manages waves and spawning.
+/// Manages the planet arena state, timer progression and victory/defeat conditions. A planet = an arena
 /// </summary>
-public class PlanetArenaManager : MonoBehaviour
+public class PlanetManager : MonoBehaviour
 {
     #region Delegates
 
@@ -34,13 +34,13 @@ public class PlanetArenaManager : MonoBehaviour
     [SerializeField]
     private PlanetData _planetData;
 
-    /// <inheritdoc cref="WaveManager"/>
+    /// <inheritdoc cref="PlanetWaveManager"/>
     [SerializeField]
-    private WaveManager _waveManager;
+    private PlanetWaveManager _waveManager;
 
-    ///<inheritdoc cref="EnemiesSpawnManager"/>
+    ///<inheritdoc cref="PlanetEnemiesManager"/>
     [SerializeField]
-    private EnemiesSpawnManager _enemiesManager;
+    private PlanetEnemiesManager _enemiesManager;
 
     private float _timer;
     private bool _isTimerRunning;
@@ -52,14 +52,14 @@ public class PlanetArenaManager : MonoBehaviour
 
     private void Awake()
     {
-        _waveManager = FindFirstObjectByType<WaveManager>();
-        _enemiesManager = FindFirstObjectByType<EnemiesSpawnManager>();
+        _waveManager = FindFirstObjectByType<PlanetWaveManager>();
+        _enemiesManager = FindFirstObjectByType<PlanetEnemiesManager>();
 
         if (_waveManager == null)
-            _waveManager = new WaveManager();
+            _waveManager = new PlanetWaveManager();
 
         if (_enemiesManager == null)
-            _enemiesManager = new EnemiesSpawnManager();
+            _enemiesManager = new PlanetEnemiesManager();
 
         InitManagers();
     }

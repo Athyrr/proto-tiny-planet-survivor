@@ -19,6 +19,8 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     [SerializeField]
     protected Transform _target = null;
 
+    private TickManager _tickManager;
+
     private PlanetComponent _planet = null;
 
     private Vector3 _targetDirection = Vector3.zero;
@@ -68,13 +70,16 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
 
     public bool IsActive => isActiveAndEnabled;
 
+    ///<inheritdoc cref="ITickable.Tick(float)"/>
     public void Tick(float deltaTime)
     {
         _targetDirection = _target.position - transform.position;
         _targetDirection.Normalize();
 
-        _movement.Move(_targetDirection, deltaTime);
+        var avoidanceForce = CalculateAvoidance();
+        Vector3 computedDirection = _targetDirection + avoidanceForce;
 
+        _movement.Move(computedDirection, deltaTime);
         _damager.UpdateTimer(deltaTime);
     }
 
@@ -90,4 +95,36 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     }
 
     #endregion
+
+
+    #region Private API 
+
+    private Vector3 CalculateAvoidance()
+    {
+        //@todo if low priority return
+
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, _movement.MovementData.AvoidanceDetectionRadius, _movement.MovementData.AvoidanceLayer);
+
+        Vector3 avoidanceForce = new();
+
+        foreach (var obj in nearbyObjects)
+        {
+            if (obj.transform == transform)
+                continue;
+
+            Vector3 objToEnemy = transform.position - obj.transform.position;
+            float distance = objToEnemy.magnitude;
+
+            if (distance < _movement.MovementData.AvoidanceMaxDistance)
+            {
+                float forceField = 1 - (distance / _movement.MovementData.AvoidanceMaxDistance);
+                avoidanceForce += objToEnemy * forceField;
+            }
+        }
+
+        return _planet.ProjectOnSurface(avoidanceForce, transform.position);
+    }
+
+    #endregion
+
 }
