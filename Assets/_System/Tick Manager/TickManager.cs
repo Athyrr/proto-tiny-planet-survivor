@@ -114,6 +114,11 @@ public class TickManager : MonoBehaviour
     /// </summary>
     private Dictionary<ETickPriority, TickSettings> _settingsMap;
 
+    /// <summary>
+    /// The duration betwenn the last frame for each group.
+    /// </summary>
+    private Dictionary<ETickPriority, float> _lastTickTime = new Dictionary<ETickPriority, float>();
+
 
     // Frame counters 
     private int _highPriorityFrameCounter = 0;
@@ -124,6 +129,9 @@ public class TickManager : MonoBehaviour
     private float _lastSortTime = 0f;
     private float _highDistanceSqr;
     private float _mediumDistanceSqr;
+
+    // Frame Staggering
+    private Dictionary<ETickPriority, int> _lastIndexTicked = new Dictionary<ETickPriority, int>();
 
     // Culling
     private float _cullingDistanceSqr;
@@ -277,6 +285,21 @@ public class TickManager : MonoBehaviour
             { ETickPriority.Medium, new List<ITickable>()},
             { ETickPriority.Low, new List<ITickable>() }
         };
+
+        _lastIndexTicked = new Dictionary<ETickPriority, int>
+        {
+            { ETickPriority.High, 0 },
+            { ETickPriority.Medium, 0 },
+            { ETickPriority.Low, 0 }
+        };
+
+        _lastTickTime = new Dictionary<ETickPriority, float>
+        {
+            { ETickPriority.High, 0 },
+            { ETickPriority.Medium, 0 },
+            { ETickPriority.Low, 0 }
+        };
+
     }
 
     private void ValidateSettings()
@@ -439,24 +462,36 @@ public class TickManager : MonoBehaviour
         if (tickables.Count == 0)
             return;
 
+        // Adjust delta time based on frame interval
+        float deltaTime = Time.time - _lastTickTime[priority];
+        //float deltaTime = _lastTickTime[priority] * settings.FrameInterval; 
+
+        _lastTickTime[priority] = Time.time;
+
         float frameStartTime = Time.realtimeSinceStartup * 1000f;
-        float deltaTime = Time.deltaTime * settings.FrameInterval; // Adjust delta time based on frame interval
-        int processed = 0;
         int maxObjects = settings.MaxObjectsPerFrame == -1 ? tickables.Count : settings.MaxObjectsPerFrame;
+        int processed = 0;
+
+        // Retrieve the last object ticked.
+        int startIndex = _lastIndexTicked[priority];
 
         // Update objects with time budget management
         for (int i = 0; i < tickables.Count && processed < maxObjects; i++)
         {
-            var tickable = tickables[i];
+            // Ensure the index never exceed group count.
+            int index = (startIndex + i) % tickables.Count;
+
+            var tickable = tickables[index];
+
             if (tickable == null || !tickable.IsActive)
                 continue;
 
+            // Tick using calculated delta
             tickable.Tick(deltaTime);
-            //tickable.Tick(Time.deltaTime);
             processed++;
 
             // Check time budget every 10 iterations for performance
-            if (processed > 0 && processed % 10 == 0)
+            if ( processed % 10 == 0)
             {
                 float elapsed = (Time.realtimeSinceStartup * 1000f) - frameStartTime;
                 if (elapsed > settings.TimeBudgetMs)
@@ -467,6 +502,11 @@ public class TickManager : MonoBehaviour
                     }
                     break;
                 }
+            }
+
+            if (processed > 0 && tickables.Count > 0)
+            {
+                _lastIndexTicked[priority] = (startIndex + processed) % tickables.Count;
             }
         }
 
