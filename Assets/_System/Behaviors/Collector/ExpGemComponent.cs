@@ -50,8 +50,9 @@ public class ExpGemComponent : MonoBehaviour, ICollectible
     }
 
     ///<inheritdoc cref="ICollectible.ApplyEffects(ICollector)"/>
-    public bool ApplyEffects(ICollector collector)
+    public bool ApplyEffects(ICollector collector, LevelComponent leveller)
     {
+        leveller.GainExp(10);
         return true;
     }
 

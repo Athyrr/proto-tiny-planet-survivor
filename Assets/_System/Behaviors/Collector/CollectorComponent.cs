@@ -68,12 +68,15 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T 
     [SerializeField]
     private Color _debugColor = Color.red;
 
+    ///<inheritdoc cref="LevelComponent"/>
+    private LevelComponent _playerLevel = null;
 
     private List<CollectibleAnimation> _collectibleAnimations = new();
 
     private Coroutine _collectibleAnimationsCoroutine = null;
 
     private float _collectRange = 0f;
+
 
     #endregion
 
@@ -86,6 +89,11 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T 
         _triggerCollider.radius = CollectRange;
 
         _collectRange = CollectRange;
+    }
+
+    private void Start()
+    {
+        TryGetComponent<LevelComponent>(out _playerLevel);
     }
 
     protected virtual void Update()
@@ -175,7 +183,7 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T 
     {
         // Play player effects when it collects.
 
-        return collecible.ApplyEffects(this);
+        return collecible.ApplyEffects(this, _playerLevel);
     }
 
     protected virtual IEnumerator AnimateCollectCouroutine()

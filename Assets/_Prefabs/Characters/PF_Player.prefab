@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 1245920828126245406}
   - component: {fileID: 5996622872072827153}
   - component: {fileID: 8629139219913991639}
+  - component: {fileID: 3280109315989383828}
   m_Layer: 6
   m_Name: PF_Player
   m_TagString: Untagged
@@ -308,8 +309,22 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3280109315989383828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3696109521651881084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e9ee2e7d3651ac4ca681992ccb42e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxLevel: 5
+  _levelExpRequired: 50
 --- !u!1 &4196254965742729722
 GameObject:
   m_ObjectHideFlags: 0

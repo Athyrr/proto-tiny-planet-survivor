@@ -28,6 +28,6 @@ public interface ICollectible
     /// </summary>
     /// <param name="collector"></param>
     /// <returns></returns>
-    bool ApplyEffects(ICollector collector);
+    bool ApplyEffects(ICollector collector, LevelComponent leveller);
 
 }
