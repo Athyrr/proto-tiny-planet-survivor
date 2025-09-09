@@ -135,6 +135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _movement: {fileID: 230034375387303956}
   _damager: {fileID: 553269163184470165}
+  _damageable: {fileID: 0}
   _target: {fileID: 0}
 --- !u!114 &230034375387303956
 MonoBehaviour:

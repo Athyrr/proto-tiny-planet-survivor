@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxHealth: 100
   IsInvicible: 0
+  GemTest: {fileID: -4067815161027127655, guid: e5cd0a01c8e3dce488defd6f1b3acf7a, type: 3}

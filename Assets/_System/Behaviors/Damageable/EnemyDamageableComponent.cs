@@ -30,8 +30,12 @@ public class EnemyDamageableComponent : BaseDamageableComponent
 
     private bool Kill()
     {
+        // @todo un register TM + gem release on nme controller instead
+
         var tm = FindAnyObjectByType<TickManager>();
         var tickable = GetComponent<ITickable>();
+
+        Instantiate(DamageableData.GemTest, transform.position, Quaternion.identity);
 
         if (tm == null || tickable == null)
             Destroy(this.gameObject);

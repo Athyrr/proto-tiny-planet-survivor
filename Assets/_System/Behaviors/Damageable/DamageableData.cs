@@ -8,4 +8,7 @@ public class DamageableData : ScriptableObject
     public float MaxHealth = 0f;
 
     public bool IsInvicible = false;
+
+    [Header("@todo remove below")]
+    public ExpGemComponent GemTest;
 }

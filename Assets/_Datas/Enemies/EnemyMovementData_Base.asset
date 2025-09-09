@@ -17,10 +17,11 @@ MonoBehaviour:
   Acceleration: 50
   Deceleration: 50
   RotationSpeed: 0
-  AvoidanceDetectionRadius: 2
   AvoidanceLayer:
     serializedVersion: 2
     m_Bits: 128
+  AvoidanceDetectionRadius: 5
+  AvoidanceMaxDistance: 4
   AvoidanceForceCurve:
     serializedVersion: 2
     m_Curve:

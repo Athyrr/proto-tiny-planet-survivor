@@ -10,11 +10,11 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     [SerializeField]
     private EnemyDamagerComponent _damager;
 
-    //[SerializeField]
-    //private EnemyAIComponent _ai;
+    [SerializeField]
+    private EnemyDamageableComponent _damageable;
 
     //[SerializeField]
-    //private EnemyDamageableComponent _damageable;
+    //private EnemyAIComponent _ai;
 
     [SerializeField]
     protected Transform _target = null;
@@ -38,8 +38,8 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
             _damager = GetComponent<EnemyDamagerComponent>();
         //if (_ai == null)
         //    _ai = GetComponent<EnemyAIComponent>();
-        //if (_damageable == null)
-        //    _damageable = GetComponent<EnemyDamageableComponent>();
+        if (_damageable == null)
+            _damageable = GetComponent<EnemyDamageableComponent>();
     }
 
     private void Start()
@@ -59,6 +59,9 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
 
         if (_damager == null)
             Debug.LogError($"{nameof(EnemyDamagerComponent)} component field is empty.");
+
+        if (_damageable == null)
+            Debug.LogError($"{nameof(EnemyDamageableComponent)} component field is empty.");
     }
 
     #endregion

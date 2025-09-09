@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b311b4d94ca97f4f8b2d88c5d9b1fde, type: 3}
   m_Name: PlayerDamagerData
   m_EditorClassIdentifier: 
-  Damage: 50
+  Damage: 200
   AttackRadius: 15
   Cooldown: 0.5
   TargetLayer:
