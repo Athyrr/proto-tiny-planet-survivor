@@ -146,13 +146,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2914864429189336712}
+  - component: {fileID: 7115163147828917929}
   - component: {fileID: 6674628553766824082}
   - component: {fileID: 7447786827456265221}
   - component: {fileID: 6757090454978562148}
   - component: {fileID: 1245920828126245406}
+  - component: {fileID: 3280109315989383828}
   - component: {fileID: 5996622872072827153}
   - component: {fileID: 8629139219913991639}
-  - component: {fileID: 3280109315989383828}
   m_Layer: 6
   m_Name: PF_Player
   m_TagString: Untagged
@@ -178,6 +179,24 @@ Transform:
   - {fileID: 3981674876615201011}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7115163147828917929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3696109521651881084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf272bb7382adf44cb49389d46386dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 6674628553766824082}
+  _movement: {fileID: 7447786827456265221}
+  _damageable: {fileID: 6757090454978562148}
+  _damager: {fileID: 1245920828126245406}
+  _leveller: {fileID: 3280109315989383828}
+  _gemCollector: {fileID: 5996622872072827153}
 --- !u!114 &6674628553766824082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,6 +256,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _data: {fileID: 11400000, guid: 36f1f8795a6d0674ab60212d6b6eb540, type: 2}
   AllowAttack: 1
+--- !u!114 &3280109315989383828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3696109521651881084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e9ee2e7d3651ac4ca681992ccb42e4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxLevel: 5
+  _levelExpRequired: 50
 --- !u!114 &5996622872072827153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,7 +283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _triggerCollider: {fileID: 8629139219913991639}
-  CollectRange: 10
+  BaseCollectRange: 5
   CollectibleLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -288,7 +321,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _drawDebug: 0
+  _drawDebug: 1
   _debugColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!135 &8629139219913991639
 SphereCollider:
@@ -311,20 +344,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3280109315989383828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3696109521651881084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e9ee2e7d3651ac4ca681992ccb42e4c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxLevel: 5
-  _levelExpRequired: 50
 --- !u!1 &4196254965742729722
 GameObject:
   m_ObjectHideFlags: 0

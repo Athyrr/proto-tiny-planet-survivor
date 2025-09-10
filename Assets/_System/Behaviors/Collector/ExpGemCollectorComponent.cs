@@ -1,6 +1,3 @@
-
-using UnityEngine;
-
 public class ExpGemCollectorComponent : CollectorComponent<ExpGemComponent>
 {
 
@@ -15,6 +12,7 @@ public class ExpGemCollectorComponent : CollectorComponent<ExpGemComponent>
 
 
     #region Public API
+
     #endregion
 
 }

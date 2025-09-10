@@ -6,6 +6,9 @@ public abstract class BaseDamageableComponent : MonoBehaviour
     public delegate void HealthChangeDelegate(float previousHealth, float previousMaxHealth, BaseDamageableComponent damageable);
     public HealthChangeDelegate OnHealthChange;
 
+    public delegate void DeathDelegate(BaseDamageableComponent damageable);
+    public DeathDelegate OnDeath;
+
     [SerializeField]
     protected DamageableData _data = null;
 

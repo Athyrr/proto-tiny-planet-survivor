@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Represents an object that <see cref="CollectorComponent"/> could pick up.
+/// Represents an object that <see cref="CollectorComponent{T}"/> could pick up.
 /// </summary>
 public interface ICollectible
 {

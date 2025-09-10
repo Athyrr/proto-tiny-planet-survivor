@@ -78,19 +78,21 @@ public class PlayerControllerComponent : MonoBehaviour
         {
             _worldAimPoint = hitInfo.point;
 
-            Vector3 aimDirection = GetTangentialDirection(transform.position, hitInfo.point);
+            //Vector3 aimDirection = GetTangentialDirection(transform.position, hitInfo.point);
+            Vector3 aimDirection = _planet.ProjectOnSurface(transform.position, hitInfo.point).normalized;
 
             if (aimDirection.sqrMagnitude > 0.01f)
                 _aimDirection = new Vector2(aimDirection.x, aimDirection.z);
         }
     }
 
-    private Vector3 GetTangentialDirection(Vector3 from, Vector3 to)
-    {
-        Vector3 planetNormal = _planet.GetNormalAtPosition(from);
-        Vector3 direction = (to - from);
-        return Vector3.ProjectOnPlane(direction, planetNormal).normalized;
-    }
+    
+    //private Vector3 GetTangentialDirection(Vector3 from, Vector3 to)
+    //{
+    //    Vector3 planetNormal = _planet.GetNormalAtPosition(from);
+    //    Vector3 direction = (to - from);
+    //    return Vector3.ProjectOnPlane(direction, planetNormal).normalized;
+    //}
 
     private void UpdateMovement(Vector2 input, float delta)
     {

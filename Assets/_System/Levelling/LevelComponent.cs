@@ -50,15 +50,13 @@ public class LevelComponent : MonoBehaviour
 
     public bool LevelUp()
     {
-        int previousLevel = _level;
-        _level = Math.Min(_maxLevel, ++_level);
+        if (_level >= _maxLevel)
+            return false;
 
-        // @todo exp required for levels formula here
-        _levelExpRequired *= 3;
+        _level++;
+        _levelExpRequired *= 3; // @todo exp required for levels formula here
 
-        if (_level != previousLevel)
-            OnLevelChange(_level);
-
+        OnLevelChange?.Invoke(_level);
         return true;
     }
 
