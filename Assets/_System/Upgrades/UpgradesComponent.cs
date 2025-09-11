@@ -110,6 +110,11 @@ public class UpgradesComponent : MonoBehaviour
         return success;
     }
 
+    /// <summary>
+    /// @todo
+    /// </summary>
+    /// <param name="upgradables"></param>
+    /// <returns></returns>
     public bool AppyUpgrade(params IUpgradableBehavior[] upgradables)
     {
         return AppyUpgrade(_selectedUpgrade, upgradables);
