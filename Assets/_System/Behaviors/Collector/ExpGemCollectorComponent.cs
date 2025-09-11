@@ -1,18 +1,1 @@
-public class ExpGemCollectorComponent : CollectorComponent<ExpGemComponent>
-{
-
-    #region Fields
-
-    #endregion
-
-
-    #region Lifecycle
-
-    #endregion
-
-
-    #region Public API
-
-    #endregion
-
-}
+public class ExpGemCollectorComponent : CollectorComponent<ExpGemComponent> { }

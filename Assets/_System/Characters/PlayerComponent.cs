@@ -153,9 +153,6 @@ public class PlayerComponent : MonoBehaviour, IDisposable
 
         _upgrader.PresentUpgradeChoices();
 
-        //@todo remove
-        _gemCollector.TriggerCollider.radius *= 1.2f;
-
         // @todo use tick system 
         Time.timeScale = 0;
     }
@@ -191,6 +188,10 @@ public class PlayerComponent : MonoBehaviour, IDisposable
 
             case UpgradeSO_IncreaseAttackRange:
                 _upgrader.AppyUpgrade(upgrade, _damager, _leveller);
+                break;
+
+            case UpgradeSO_IncreaseCollectRange:
+                _upgrader.AppyUpgrade(upgrade, _gemCollector, _leveller);
                 break;
 
             default:

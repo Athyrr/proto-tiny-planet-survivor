@@ -16,9 +16,6 @@ public class EnemyDamageableComponent : BaseDamageableComponent
             return false;
 
         _health -= amount;
-
-        //Debug.Log($"Enemy took {amount} damage from {source.name}. Health: {_health}");
-
         //OnHealthChange.Invoke(_health + amount, _data.MaxHealth, this);
 
         if (_health <= 0)
@@ -34,6 +31,8 @@ public class EnemyDamageableComponent : BaseDamageableComponent
 
         var tm = FindAnyObjectByType<TickManager>();
         var tickable = GetComponent<ITickable>();
+
+        OnDeath?.Invoke(this);
 
         Instantiate(DamageableData.GemTest, transform.position, Quaternion.identity);
 

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a938633482c8214f8b3ed669542f610, type: 3}
   m_Name: UpgradeSO_MoveSpeed_1
   m_EditorClassIdentifier: 
-  _name: Move 1
-  _description: 
-  _icon: {fileID: 0}
+  _name: Move Speed +5%
+  _description: Increase Move Speed +5%
+  _icon: {fileID: 21300000, guid: c7e651f462894c14a95165bc2dadf301, type: 3}
   _upgradeStrategy: 0
   _amount: 1.05
