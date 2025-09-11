@@ -116,6 +116,15 @@ public class PlanetWaveManager : MonoBehaviour, IArenaManager
             return;
         }
 
+        _waveIndex++;
+
+        if (_waveIndex >= _waves.Length)
+        {
+            AllWavesCompleted();
+            return;
+        }
+
+        StartCoroutine(WaitForWaveCoroutine(_waveIndex));
         StartWave(_waveIndex);
     }
 
@@ -124,40 +133,25 @@ public class PlanetWaveManager : MonoBehaviour, IArenaManager
         if (_hasArenaFinished || !_hasArenaStarted)
             return;
 
-        if (_waveIndex >= _waves.Length)
-        {
-            AllWavesCompleted();
-            return;
-        }
-
         Wave wave = _waves[_waveIndex];
         _waveTimer += delta;
         OnWaveUpdate?.Invoke(_waveIndex, delta, _waveTimer);
 
-        //Debug.Log($"Wave {_waveIndex + 1} / {_waves.Length} - Time: {_waveTimer} / {wave.Duration}");
-
         if (_waveTimer >= wave.Duration)
         {
+            //Handle wave ends
             OnWaveEnd?.Invoke(_waveIndex);
 
-            _waveIndex++;
-            if (_waveIndex >= _waves.Length)
-            {
-                AllWavesCompleted();
-                return;
-            }
-            else
-            {
-                StartCoroutine(WaitForWaveCoroutine(_waveIndex));
-                OnWaveStart?.Invoke(CurrentWave);
-            }
+            NextWave();
         }
     }
 
     public void AllWavesCompleted()
     {
-        OnAllWavesCompleted?.Invoke();
         _hasArenaFinished = true;
+        OnAllWavesCompleted?.Invoke();
+
+        Debug.Log("Ended all waves");
     }
 
 
