@@ -60,6 +60,15 @@ public class PlayerMovementComponent : BaseMovementComponent
         return _velocity.magnitude > 0.01f;
     }
 
+    public bool SetMoveSpeed(float speed)
+    {
+        if (_speed == speed)
+            return false;
+
+        _speed = Mathf.Max(_speed, speed);
+        return true;
+    }
+
     #endregion
 
 

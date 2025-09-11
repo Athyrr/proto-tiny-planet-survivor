@@ -153,6 +153,7 @@ GameObject:
   - component: {fileID: 1245920828126245406}
   - component: {fileID: 3280109315989383828}
   - component: {fileID: 5996622872072827153}
+  - component: {fileID: 353286746282450446}
   - component: {fileID: 8629139219913991639}
   m_Layer: 6
   m_Name: PF_Player
@@ -196,6 +197,7 @@ MonoBehaviour:
   _damageable: {fileID: 6757090454978562148}
   _damager: {fileID: 1245920828126245406}
   _leveller: {fileID: 3280109315989383828}
+  _upgrader: {fileID: 353286746282450446}
   _gemCollector: {fileID: 5996622872072827153}
 --- !u!114 &6674628553766824082
 MonoBehaviour:
@@ -323,6 +325,21 @@ MonoBehaviour:
     m_RotationOrder: 4
   _drawDebug: 1
   _debugColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &353286746282450446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3696109521651881084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d1a06ff335db04d9f830197a22b799, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _upgradeDatabase: []
+  _upgradeChoicesCount: 3
+  _drawDebug: 0
 --- !u!135 &8629139219913991639
 SphereCollider:
   m_ObjectHideFlags: 0

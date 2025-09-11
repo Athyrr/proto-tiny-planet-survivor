@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class BaseDamagerComponent : MonoBehaviour
+public abstract class BaseDamagerComponent : MonoBehaviour, IUpgradableBehavior
 {
     #region Fields
 
@@ -10,6 +10,8 @@ public abstract class BaseDamagerComponent : MonoBehaviour
     protected float _damage = 0f;
     protected float _cooldown = 0f;
     protected bool _canAttack = true;
+
+    protected float _range;
 
     protected float _timer = 0f;
 
@@ -32,6 +34,7 @@ public abstract class BaseDamagerComponent : MonoBehaviour
         _damage = _data.Damage;
         _cooldown = _data.Cooldown;
         _timer = 0f;
+        _range = _data.AttackRadius;
 
         return true;
 
@@ -41,6 +44,8 @@ public abstract class BaseDamagerComponent : MonoBehaviour
 
 
     #region Public API
+
+    public float Range => _range;
 
     public bool CanApplyDamage => _canAttack;
 
@@ -65,6 +70,12 @@ public abstract class BaseDamagerComponent : MonoBehaviour
     }
 
     public abstract bool CanAttack(float damage);
+
+    public void SetRange(float range)
+    {
+        if (_range != range)
+            _range = range;
+    }
 
     #endregion
 }

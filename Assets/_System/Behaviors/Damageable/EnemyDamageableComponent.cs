@@ -43,7 +43,6 @@ public class EnemyDamageableComponent : BaseDamageableComponent
         tm.Unregister(tickable);
         Destroy(this.gameObject);
 
-        Debug.Log("Enemy destroyed");
         return true;
     }
 

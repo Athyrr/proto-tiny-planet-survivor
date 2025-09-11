@@ -48,7 +48,7 @@ public class PlayerDamagerComponent : BaseDamagerComponent
 
     private void GetNearbyEnemies()
     {
-        var colliders = Physics.OverlapSphere(transform.position, Data.AttackRadius, Data.TargetLayer);
+        var colliders = Physics.OverlapSphere(transform.position, _range, Data.TargetLayer);
 
         if (colliders.Length <= 0)
             return;
@@ -70,7 +70,7 @@ public class PlayerDamagerComponent : BaseDamagerComponent
     private void OnDrawGizmos()
     {
         Gizmos.color = Data.DebugColor;
-        Gizmos.DrawWireSphere(transform.position, Data.AttackRadius);
+        Gizmos.DrawWireSphere(transform.position, _range);
     }
 
     #endregion

@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public abstract class BaseDamageableComponent : MonoBehaviour
+public abstract class BaseDamageableComponent : MonoBehaviour, IUpgradableBehavior
 {
     public delegate void HealthChangeDelegate(float previousHealth, float previousMaxHealth, BaseDamageableComponent damageable);
     public HealthChangeDelegate OnHealthChange;

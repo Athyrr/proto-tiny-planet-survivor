@@ -27,7 +27,7 @@ public class PlanetEnemiesManager : MonoBehaviour, IArenaManager
     private int _maxEnemies = 800;
 
     private PlayerControllerComponent _player = null;
-    
+
     private PlanetData _planetData = null;
 
     private PlanetComponent _planet;
@@ -79,7 +79,10 @@ public class PlanetEnemiesManager : MonoBehaviour, IArenaManager
     private IEnumerator SpawnWaveEnemiesCoroutine(Wave wave)
     {
         if (wave == null)
-            Debug.LogWarning("Wave nulllllllllllllllllll");
+        {
+            _spawnCoroutine = null;
+            yield break;
+        }
 
         foreach (var spawnInfo in wave.EnemiesToSpawn)
         {
@@ -164,7 +167,7 @@ public class PlanetEnemiesManager : MonoBehaviour, IArenaManager
     private void SpawnEnemy(GameObject enemy, Vector3 position)
     {
         if (enemy == null)
-            Debug.LogWarning("Nulllllllllll");
+            return;
 
         var instance = Instantiate(enemy, position, Quaternion.identity); // @todo use Pooling instead
 

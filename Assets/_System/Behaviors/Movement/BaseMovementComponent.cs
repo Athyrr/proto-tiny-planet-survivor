@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class BaseMovementComponent : MonoBehaviour
+public abstract class BaseMovementComponent : MonoBehaviour, IUpgradableBehavior
 {
     #region Fields
 

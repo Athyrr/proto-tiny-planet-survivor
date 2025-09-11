@@ -89,17 +89,15 @@ public class PlanetWaveManager : MonoBehaviour, IArenaManager
         _waveTimer = 0f;
         _waitForNextWave = false;
 
-        _isManagerIntialized =  _player != null;
+        _isManagerIntialized = _player != null;
         return _isManagerIntialized;
     }
 
     public void StartArenaWaves()
     {
         if (!IsManagerIntialized)
-        {
-            Debug.LogError($"{nameof(PlanetWaveManager)}  is not initialized.");
             return;
-        }
+
 
         NextWave();
     }
@@ -114,17 +112,18 @@ public class PlanetWaveManager : MonoBehaviour, IArenaManager
             StartWave(0);
             _hasArenaStarted = true;
             _hasArenaFinished = false;
-            Debug.Log("First Wave");
 
             return;
         }
 
-        Debug.Log("Next Wave");
         StartWave(_waveIndex);
     }
 
     public void UpdateWave(float delta)
     {
+        if (_hasArenaFinished || !_hasArenaStarted)
+            return;
+
         if (_waveIndex >= _waves.Length)
         {
             AllWavesCompleted();
@@ -157,7 +156,6 @@ public class PlanetWaveManager : MonoBehaviour, IArenaManager
 
     public void AllWavesCompleted()
     {
-        Debug.Log("All waves completed!");
         OnAllWavesCompleted?.Invoke();
         _hasArenaFinished = true;
     }

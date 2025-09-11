@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Represents the ability to levelling up of an entity.
 /// </summary>
-public class LevelComponent : MonoBehaviour
+public class LevelComponent : MonoBehaviour, IUpgradableBehavior
 {
 
     #region Delegates

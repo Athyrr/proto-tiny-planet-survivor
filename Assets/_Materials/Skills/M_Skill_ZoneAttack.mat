@@ -53,7 +53,7 @@ Material:
     - _AlphaClip: 0.12
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Ratio: 0.30190998
+    - _Ratio: 0.58037055
     m_Colors:
     - _Color: {r: 0.6509434, g: 0.39096433, b: 0.08290311, a: 0.2}
   m_BuildTextureStacks: []

@@ -1,9 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AdaptivePerformance;
-using static TickManager;
 
 /// <summary>
 /// Represents an ability to collect an <see cref="ICollectible"/>.
@@ -13,7 +10,7 @@ using static TickManager;
 /// If you need to add a new type of collector, ensure that you added a new sphere collider and assign it to this component in the inspector. If you need a custom editor, ask for Adam.
 /// </remarks>
 [RequireComponent(typeof(SphereCollider))]
-public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T : ICollectible
+public abstract class CollectorComponent<T> : MonoBehaviour, ICollector, IUpgradableBehavior where T : ICollectible
 {
     #region Sub-class
 
@@ -178,6 +175,7 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T 
 
         // Start the collect animation
         collectible.Collect(this); //@todo Handle collectible.Collect by listening the delegate and remove here.
+       
         OnCollectItem?.Invoke(collectible);
 
         _collectibleAnimations.Add(new CollectibleAnimation(collectible, 0));
@@ -282,7 +280,6 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector where T 
         Gizmos.color = _debugColor;
         Gizmos.DrawWireSphere(_triggerCollider.transform.position, CollectRange);
     }
-
 
     private void DrawCollectiblesStats()
     {

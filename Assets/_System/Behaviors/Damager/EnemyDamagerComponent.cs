@@ -14,8 +14,6 @@ public class EnemyDamagerComponent : BaseDamagerComponent
     protected override bool Init()
     {
         base.Init();
-
-        Debug.Log("Enemy Damager Init" + Data.Damage);
         return true;
     }
 
@@ -26,7 +24,6 @@ public class EnemyDamagerComponent : BaseDamagerComponent
 
     public override bool Attack(float damage)
     {
-        Debug.Log("Enemy Attack");
         return true;
     }
 
