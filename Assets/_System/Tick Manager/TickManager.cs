@@ -69,6 +69,9 @@ public class TickManager : MonoBehaviour
     [Space]
 
     [SerializeField]
+    private bool _useCullingDistance = false;
+
+    [SerializeField]
     private float _cullingDistance = 60f;
 
     [SerializeField]
@@ -329,7 +332,6 @@ public class TickManager : MonoBehaviour
             return;
 
         float startTime = Time.realtimeSinceStartup * 1000f;
-
         Vector3 playerPosition = _player.position;
 
         // Sort all updatables
@@ -368,10 +370,10 @@ public class TickManager : MonoBehaviour
 
         float sqrDistance = (tickable.Position - _player.position).sqrMagnitude;
 
-        if (sqrDistance > _cullingDistanceSqr)
+        if (_useCullingDistance && sqrDistance > _cullingDistanceSqr)
             return ETickPriority.Disable;
 
-        else if (sqrDistance < _highDistanceSqr)
+        if (sqrDistance < _highDistanceSqr)
             return ETickPriority.High;
 
         else if (sqrDistance < _mediumDistanceSqr)
@@ -491,7 +493,7 @@ public class TickManager : MonoBehaviour
             processed++;
 
             // Check time budget every 10 iterations for performance
-            if ( processed % 10 == 0)
+            if (processed % 10 == 0)
             {
                 float elapsed = (Time.realtimeSinceStartup * 1000f) - frameStartTime;
                 if (elapsed > settings.TimeBudgetMs)
