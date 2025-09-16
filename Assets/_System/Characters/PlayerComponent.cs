@@ -70,6 +70,15 @@ public class PlayerComponent : MonoBehaviour, IDisposable
         UnsubscribeServices();
     }
 
+    private void Update()
+    {
+        float delta = Time.deltaTime;
+
+        _controller.UpdateMovement(delta);
+        _damager.UpdateTimer(delta);
+        _gemCollector.UpdateCollector(delta);
+    }
+
     private void OnDestroy()
     {
         Dispose();

@@ -76,6 +76,7 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
     ///<inheritdoc cref="ITickable.Tick(float)"/>
     public void Tick(float deltaTime)
     {
+        return;
         _targetDirection = _target.position - transform.position;
         _targetDirection.Normalize();
 
@@ -102,6 +103,10 @@ public class EnemyControllerComponent : MonoBehaviour, ITickable
 
     #region Private API 
 
+    /// <summary>
+    /// Compute avoidance to prevent characters overlaps.
+    /// </summary>
+    /// <returns></returns>
     private Vector3 CalculateAvoidance()
     {
         //@todo if low priority return

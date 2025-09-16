@@ -257,6 +257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data: {fileID: 11400000, guid: 36f1f8795a6d0674ab60212d6b6eb540, type: 2}
+  _abilities: []
   AllowAttack: 1
 --- !u!114 &3280109315989383828
 MonoBehaviour:
@@ -270,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e9ee2e7d3651ac4ca681992ccb42e4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxLevel: 5
+  _maxLevel: 10
   _levelExpRequired: 50
 --- !u!114 &5996622872072827153
 MonoBehaviour:
@@ -296,12 +297,21 @@ MonoBehaviour:
     - serializedVersion: 3
       time: -0.001625061
       value: 0.0018615723
-      inSlope: -1.4742357
-      outSlope: -1.4742357
+      inSlope: -4.0430045
+      outSlope: -4.0430045
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.09031515
+      outWeight: 0.27131757
+    - serializedVersion: 3
+      time: 0.08750769
+      value: -0.16474773
+      inSlope: -0.013458008
+      outSlope: -0.013458008
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 0.52343184
       value: 0.3985807
@@ -323,8 +333,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _drawDebug: 1
-  _debugColor: {r: 1, g: 0, b: 0, a: 1}
+  _drawDebug: 0
+  _debugColor: {r: 0, g: 0.7728834, b: 1, a: 1}
 --- !u!114 &353286746282450446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,9 +347,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d1a06ff335db04d9f830197a22b799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _upgradeDatabase: []
+  _upgradeDatabase:
+  - {fileID: 11400000, guid: d8ed2c6c86b849648810ef617469292d, type: 2}
+  - {fileID: 11400000, guid: fd0075f57cf0e104bae2cc48828c06f8, type: 2}
+  - {fileID: 11400000, guid: bd942150da38f6049ae2b37fc7205e25, type: 2}
+  - {fileID: 11400000, guid: 31450ac7031cc6a49960312682b05cdb, type: 2}
+  - {fileID: 11400000, guid: dc1c4345a55753f4f860c223dac58d0f, type: 2}
+  - {fileID: 11400000, guid: f6a15b97939277a47a6ab0dac2baa855, type: 2}
   _upgradeChoicesCount: 3
-  _drawDebug: 0
+  _drawDebug: 1
 --- !u!135 &8629139219913991639
 SphereCollider:
   m_ObjectHideFlags: 0

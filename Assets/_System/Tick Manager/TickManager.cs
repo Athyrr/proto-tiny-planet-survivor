@@ -562,7 +562,7 @@ public class TickManager : MonoBehaviour
         var highPriorityList = _priorityGroups[ETickPriority.High];
 
         var stats = _performanceStats;
-        string statsText = $"UpdateManager Performance:\n" +
+        string statsText = $"Tick perfs:\n" +
                           $"Frame Time: {Time.unscaledDeltaTime * 1000f:F1}ms\n" +
                           $"Total Objects: {_allTickables.Count}\n" +
                           $"High: {highPriorityList.Count} | Med: {mediumPriorityList.Count} | Low: {lowPriorityList.Count}\n" +

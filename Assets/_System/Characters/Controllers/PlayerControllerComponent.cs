@@ -61,8 +61,8 @@ public class PlayerControllerComponent : MonoBehaviour
 
     private void Update()
     {
-        UpdateMovement(_inputDirection, Time.deltaTime);
-        _damager.UpdateTimer(Time.deltaTime);
+        //UpdateMovement(Time.deltaTime);
+        //_damager.UpdateTimer(Time.deltaTime);
     }
 
     private void HandleMoveInput(InputAction.CallbackContext context)
@@ -86,18 +86,13 @@ public class PlayerControllerComponent : MonoBehaviour
         }
     }
 
-    
-    //private Vector3 GetTangentialDirection(Vector3 from, Vector3 to)
-    //{
-    //    Vector3 planetNormal = _planet.GetNormalAtPosition(from);
-    //    Vector3 direction = (to - from);
-    //    return Vector3.ProjectOnPlane(direction, planetNormal).normalized;
-    //}
 
-    private void UpdateMovement(Vector2 input, float delta)
+    public void UpdateMovement(float delta)
     {
         if (_movement == null)
             return;
+
+        var input = _inputDirection;
 
         Vector3 movementDirection;
 

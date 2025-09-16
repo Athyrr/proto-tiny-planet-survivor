@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseDamagerComponent : MonoBehaviour, IUpgradableBehavior
@@ -10,10 +11,17 @@ public abstract class BaseDamagerComponent : MonoBehaviour, IUpgradableBehavior
     protected float _damage = 0f;
     protected float _cooldown = 0f;
     protected bool _canAttack = true;
-
     protected float _range;
-
     protected float _timer = 0f;
+
+    // @todo use Abilities instances refs to track abilities performing
+    [SerializeField]
+    private AbilitySO[] _abilities = null;
+
+    /// <summary>
+    /// @todo change string into Ability (class)
+    /// </summary>
+    private Dictionary<AbilitySO, string> _abilityInstances = new Dictionary<AbilitySO, string>();  
 
     #endregion
 

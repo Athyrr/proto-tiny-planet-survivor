@@ -54,7 +54,9 @@ public class LevelComponent : MonoBehaviour, IUpgradableBehavior
             return false;
 
         _level++;
-        _levelExpRequired *=  2.5f; // @todo exp required for levels formula here
+
+        // @todo exp required for levels formula here
+        _levelExpRequired *=  2.5f;
 
         OnLevelChange?.Invoke(_level);
         return true;

@@ -9,7 +9,6 @@ public class PlanetComponent : MonoBehaviour
 
     private float _radius = 0f;
 
-
     // Normal calculation
     private Vector3 _cachedPlanetNormal;
     private Vector3 _lastCachedPosition;

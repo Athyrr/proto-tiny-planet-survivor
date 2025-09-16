@@ -93,7 +93,6 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector, IUpgrad
 
     private float _collectRange = 0f;
 
-
     #endregion
 
 
@@ -112,13 +111,6 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector, IUpgrad
         TryGetComponent<LevelComponent>(out _playerLevel);
     }
 
-    protected virtual void Update()
-    {
-        // Start the collect animations coroutine if needed
-        if (_collectibleAnimationsCoroutine == null && _collectibleAnimations.Count > 0)
-            _collectibleAnimationsCoroutine = StartCoroutine(AnimateCollectCouroutine());
-    }
-
     protected void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<T>(out T collectible))
@@ -135,6 +127,52 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector, IUpgrad
 
     public SphereCollider TriggerCollider => _triggerCollider;
     public float CollectRange => _collectRange;
+
+    public virtual void UpdateCollector(float delta)
+    {
+        if (!this.isActiveAndEnabled)
+            return;
+
+        //@todo delay frame time
+        //@todo benchmark coroutine vs update + significance
+
+        // Start the collect animations coroutine if needed
+        if (_collectibleAnimationsCoroutine == null && _collectibleAnimations.Count > 0)
+            _collectibleAnimationsCoroutine = StartCoroutine(AnimateCollectCouroutine());
+
+        //if (_collectibleAnimations.Count > 0)
+        //{
+        //    Test(delta);
+        //}
+    }
+
+    public void Test(float delta)
+    {
+        for (int i = _collectibleAnimations.Count - 1; i >= 0; i--)
+        {
+            CollectibleAnimation animation = _collectibleAnimations[i];
+
+            if (animation == null || animation.Collectible.gameObject == null)
+            {
+                _collectibleAnimations.RemoveAt(i);
+                continue;
+            }
+
+            animation.Timer += delta;
+
+            float ratio = CollectAnimationDuration > 0 ? animation.Timer / CollectAnimationDuration : 1;
+
+            animation.Collectible.gameObject.transform.position = Vector3.LerpUnclamped(animation.StartPosition, transform.position, CollectAnimationCurve.Evaluate(ratio));
+
+            if (ratio >= 1)
+            {
+                ProcessCollectEffects(animation.Collectible);
+
+                _collectibleAnimations.RemoveAt(i);
+                Destroy(animation.Collectible.gameObject);
+            }
+        }
+    }
 
     public bool SetCollectRange(float range)
     {
@@ -175,7 +213,7 @@ public abstract class CollectorComponent<T> : MonoBehaviour, ICollector, IUpgrad
 
         // Start the collect animation
         collectible.Collect(this); //@todo Handle collectible.Collect by listening the delegate and remove here.
-       
+
         OnCollectItem?.Invoke(collectible);
 
         _collectibleAnimations.Add(new CollectibleAnimation(collectible, 0));
